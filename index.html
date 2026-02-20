@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jim O'Donnell — Red Hat Demos & Projects</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06090F; --surface: #0D1117; --surface2: #161B22; --border: #1C2333;
+  --text: #F0F4F8; --dim: #8B949E; --muted: #4E5D6C;
+  --red: #EE0000; --red-glow: rgba(238,0,0,0.12);
+  --blue: #0070F2; --amber: #F59E0B; --green: #00D26A;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg); color: var(--text); font-family:'Red Hat Display',sans-serif;
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding:2rem;
+}
+.container { max-width:800px; width:100%; }
+.header {
+  text-align:center; margin-bottom:3rem;
+  padding-bottom:2rem; border-bottom:1px solid var(--border);
+}
+.logo { color:var(--red); font-size:14px; font-weight:700; letter-spacing:2px; margin-bottom:1rem; }
+h1 { font-size:2.5rem; font-weight:900; margin-bottom:0.5rem; line-height:1.2; }
+.subtitle { font-size:1rem; color:var(--dim); font-weight:300; }
+.projects { display:grid; gap:1rem; margin-bottom:2rem; }
+.project-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:1.5rem; transition:all 0.2s; text-decoration:none; color:var(--text);
+  display:flex; gap:1rem; align-items:flex-start;
+}
+.project-card:hover {
+  border-color:var(--red); transform:translateY(-2px);
+  box-shadow:0 4px 16px var(--red-glow);
+}
+.project-icon { font-size:2rem; flex-shrink:0; }
+.project-content { flex:1; }
+.project-title { font-size:1.2rem; font-weight:700; margin-bottom:0.5rem; }
+.project-desc { font-size:0.9rem; color:var(--dim); line-height:1.5; margin-bottom:0.5rem; }
+.project-url { font-family:'Red Hat Mono',monospace; font-size:0.75rem; color:var(--muted); }
+.contact {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:1.5rem; text-align:center; margin-top:2rem;
+}
+.contact a { color:var(--blue); text-decoration:none; }
+.contact a:hover { text-decoration:underline; }
+.footer {
+  text-align:center; margin-top:2rem; padding-top:2rem; border-top:1px solid var(--border);
+  font-size:0.85rem; color:var(--muted);
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">RED HAT</div>
+    <h1>Jim O'Donnell</h1>
+    <p class="subtitle">Solutions Architecture • Edge-to-Cloud Integration • SAP Business Technology Platform</p>
+  </div>
+
+  <div class="projects">
+    <a href="https://jodonnel.github.io/ohc-demo-static/" class="project-card">
+      <div class="project-icon">🔴</div>
+      <div class="project-content">
+        <div class="project-title">OpenShift Hybrid Cloud Demo</div>
+        <div class="project-desc">
+          Enterprise edge-to-cloud reference architecture. Connected devices → OpenShift → SAP BTP integration.
+          Live telemetry dashboard with real-time event streaming and SAP EIC routing.
+        </div>
+        <div class="project-url">jodonnel.github.io/ohc-demo-static</div>
+      </div>
+    </a>
+
+    <a href="https://jodonnel.github.io/ohc-demo-static/mercedes-dashboard.html" class="project-card">
+      <div class="project-icon">🚗</div>
+      <div class="project-content">
+        <div class="project-title">Mercedes-Benz Connected Vehicle Integration</div>
+        <div class="project-desc">
+          Live vehicle telemetry integration with SAP BTP. Real-time fuel, odometer, diagnostics flowing through
+          Red Hat OpenShift to SAP Event Mesh and S/4HANA. CloudEvents-based architecture.
+        </div>
+        <div class="project-url">jodonnel.github.io/ohc-demo-static/mercedes-dashboard.html</div>
+      </div>
+    </a>
+
+    <a href="https://github.com/jodonnel/job-coach" class="project-card">
+      <div class="project-icon">👨‍💼</div>
+      <div class="project-content">
+        <div class="project-title">Job Coach (Accessibility Demo)</div>
+        <div class="project-desc">
+          Workplace assistance scenario for employees with disabilities. Badge + camera + AI detection
+          helping workers navigate job tasks independently. Built for Brian.
+        </div>
+        <div class="project-url">github.com/jodonnel/job-coach</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="contact">
+    <p><strong>Contact:</strong> <a href="mailto:jodonnel@redhat.com">jodonnel@redhat.com</a></p>
+    <p style="margin-top:0.5rem; color:var(--dim);">Red Hat / SAP Solutions Architecture</p>
+  </div>
+
+  <div class="footer">
+    <p>Red Hat OpenShift + SAP Business Technology Platform</p>
+    <p style="margin-top:0.5rem;">February 2026</p>
+  </div>
+</div>
+</body>
+</html>
