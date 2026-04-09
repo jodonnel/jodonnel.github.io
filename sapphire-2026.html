@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Run. Simplify. Expand. — SAP Sapphire 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Text:wght@300;400;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06090F;
+  --surface: #0D1117;
+  --border: #1C2333;
+  --muted: #4E5D6C;
+  --text: #F0F4F8;
+  --dim: #BBBBAA;
+  --red: #EE0000;
+  --accent: #EE0000;
+  --gold: #F0AB00;
+  --warn: #CC0000;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-snap-type: y mandatory; overflow-y: scroll; }
+body { background: var(--bg); color: var(--text); font-family: 'Red Hat Display', sans-serif; }
+
+.slide {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8vh 8vw;
+  scroll-snap-align: start;
+  position: relative;
+}
+.slide::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 8vw;
+  right: 8vw;
+  height: 1px;
+  background: var(--border);
+}
+
+.slide-cover { justify-content: center; }
+.slide-closer { text-align: center; align-items: center; }
+.slide-transition { align-items: center; text-align: center; }
+
+h1 {
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 900;
+  line-height: 1.0;
+  margin-bottom: 1rem;
+}
+h2 {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+}
+.red { color: var(--red); }
+.gold { color: var(--gold); }
+
+.subtitle {
+  font-family: 'Red Hat Text', sans-serif;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: 300;
+  color: var(--dim);
+  max-width: 55ch;
+  line-height: 1.6;
+}
+.meta {
+  font-family: 'Red Hat Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  margin-top: 2rem;
+}
+
+.body-text {
+  font-family: 'Red Hat Text', sans-serif;
+  font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+  font-weight: 400;
+  color: var(--dim);
+  line-height: 1.8;
+  max-width: 700px;
+  margin-bottom: 1.5rem;
+}
+.body-text strong { color: var(--text); font-weight: 700; }
+
+.stat-hero {
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 900;
+  color: var(--red);
+  line-height: 1.0;
+  margin-bottom: 0.5rem;
+}
+.stat-label {
+  font-family: 'Red Hat Text', sans-serif;
+  font-size: 1.1rem;
+  color: var(--dim);
+  margin-bottom: 2rem;
+}
+
+.stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4rem;
+  margin: 2.5rem 0;
+}
+.stat-block .stat-hero { font-size: clamp(2rem, 4vw, 3.5rem); }
+
+.kill-chain {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.8rem 2rem;
+  align-items: center;
+  max-width: 900px;
+  margin-top: 2rem;
+}
+.kc-attack {
+  font-family: 'Red Hat Text', sans-serif;
+  font-size: 1rem;
+  color: var(--dim);
+  text-align: right;
+  padding: 0.6rem 0;
+}
+.kc-arrow {
+  font-family: 'Red Hat Mono', monospace;
+  font-size: 1rem;
+  color: var(--muted);
+}
+.kc-counter {
+  font-family: 'Red Hat Text', sans-serif;
+  font-size: 1rem;
+  color: var(--text);
+  font-weight: 700;
+  padding: 0.6rem 0;
+}
+.kc-attack strong { color: var(--red); font-weight: 700; }
+.kc-counter strong { color: var(--gold); }
+
+.transition-line {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--muted);
+  max-width: 600px;
+  line-height: 1.4;
+}
+.transition-attr {
+  font-family: 'Red Hat Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 1.5rem;
+  opacity: 0.6;
+}
+
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2.5rem;
+  margin-top: 3rem;
+  max-width: 1200px;
+}
+.pillar {
+  border-top: 3px solid var(--red);
+  padding-top: 1.5rem;
+}
+.pillar h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+}
+.pillar p {
+  font-family: 'Red Hat Text', sans-serif;
+  font-size: 0.95rem;
+  color: var(--dim);
+  line-height: 1.7;
+}
+.pillar.gold-top { border-top-color: var(--gold); }
+
+.act-label {
+  font-family: 'Red Hat Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--red);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 1.5rem;
+}
+.act-label.gold-label { color: var(--gold); }
+
+.closer-line {
+  font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.3;
+  max-width: 700px;
+  margin-bottom: 1.5rem;
+}
+
+.footer-bar {
+  font-family: 'Red Hat Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 3rem;
+}
+
+.nav-hint {
+  position: fixed;
+  bottom: 2vh;
+  right: 3vw;
+  font-family: 'Red Hat Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.timeline {
+  border-left: 2px solid var(--red);
+  padding-left: 2rem;
+  margin: 2rem 0;
+  max-width: 700px;
+}
+.timeline-event {
+  margin-bottom: 1.8rem;
+  position: relative;
+}
+.timeline-event::before {
+  content: '';
+  position: absolute;
+  left: -2.35rem;
+  top: 0.4rem;
+  width: 10px;
+  height: 10px;
+  background: var(--red);
+  border-radius: 50%;
+}
+.timeline-date {
+  font-family: 'Red Hat Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--red);
+  margin-bottom: 0.3rem;
+}
+.timeline-text {
+  font-family: 'Red Hat Text', sans-serif;
+  font-size: 1rem;
+  color: var(--dim);
+  line-height: 1.6;
+}
+.timeline-text strong { color: var(--text); }
+
+@media (max-width: 768px) {
+  .pillars { grid-template-columns: 1fr; }
+  .kill-chain { grid-template-columns: 1fr; gap: 0.3rem; }
+  .kc-attack { text-align: left; }
+  .kc-arrow { display: none; }
+  .stats-row { gap: 2rem; }
+}
+@media print {
+  .slide { page-break-after: always; min-height: 100vh; }
+  .nav-hint { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: Cover -->
+<div class="slide slide-cover">
+  <h1><span class="red">Run.</span> Simplify. <span class="gold">Expand.</span></h1>
+  <p class="subtitle">The open platform journey for SAP — standardize, defend, and extend on a single trusted foundation.</p>
+  <p class="meta">SAP Sapphire Orlando &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Red Hat</p>
+</div>
+
+<!-- SLIDE 2: The cost of not acting -->
+<div class="slide slide-section">
+  <h2>August 31, <span class="red">2025.</span></h2>
+  <p class="body-text">A major automotive manufacturer — <strong>Jaguar Land Rover</strong> — discovers that attackers have been inside their network. Credentials stolen in 2021. <strong>Never rotated.</strong></p>
+  <p class="body-text">What follows is the most expensive cybersecurity incident in UK manufacturing history.</p>
+  <div class="stats-row">
+    <div class="stat-block">
+      <div class="stat-hero">11 weeks</div>
+      <div class="stat-label">to full recovery</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-hero">£300M+</div>
+      <div class="stat-label">direct cost to JLR</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-hero">£1.9B</div>
+      <div class="stat-label">UK economy impact</div>
+    </div>
+  </div>
+  <p class="body-text">The Bank of England cited this incident in its Q3 GDP report. <strong>One breach. National consequences.</strong></p>
+</div>
+
+<!-- SLIDE 3: How it happened -->
+<div class="slide slide-section">
+  <h2>How it <span class="red">happened.</span></h2>
+  <div class="timeline">
+    <div class="timeline-event">
+      <div class="timeline-date">2021 — Credentials stolen</div>
+      <div class="timeline-text">Infostealer malware harvests employee credentials from browsers. <strong>The credentials sit in attacker hands for four years.</strong></div>
+    </div>
+    <div class="timeline-event">
+      <div class="timeline-date">August 2025 — Access</div>
+      <div class="timeline-text">Attackers authenticate to JLR's Jira server using stolen third-party credentials. They find host files, DNS entries, internal domains. <strong>The map of the entire network.</strong></div>
+    </div>
+    <div class="timeline-event">
+      <div class="timeline-date">Days later — Lateral movement</div>
+      <div class="timeline-text">Flat network. No segmentation. Corporate IT to manufacturing systems — <strong>no barrier between the office and the factory floor.</strong></div>
+    </div>
+    <div class="timeline-event">
+      <div class="timeline-date">Undetected — 350GB exfiltrated</div>
+      <div class="timeline-text">Source code. Vehicle system logic. Authentication backends. Employee data. <strong>Nobody noticed.</strong></div>
+    </div>
+    <div class="timeline-event">
+      <div class="timeline-date">September 2025 — Total shutdown</div>
+      <div class="timeline-text">All three UK plants offline. Solihull. Wolverhampton. Halewood. They couldn't isolate the breach — <strong>they had to disconnect everything.</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4: Transition -->
+<div class="slide slide-transition">
+  <p class="transition-line">"We can't prevent the initial exploit. Nobody can promise that. But we can make every step after it <strong style="color: var(--text); font-style: normal;">harder, slower, and visible</strong>."</p>
+</div>
+
+<!-- SLIDE 5: Stage 1 — Credentials -->
+<div class="slide slide-section">
+  <p class="act-label">The kill chain — what would have been different</p>
+  <h2>Credentials sat for <span class="red">four years.</span></h2>
+  <p class="body-text">Stolen in 2021. Used in 2025. The simplest control — <strong>credential rotation</strong> — would have invalidated them long before the attackers returned.</p>
+  <p class="body-text"><strong>Red Hat Ansible Automation Platform</strong> enforces credential lifecycle policies across the enterprise. Rotation isn't a reminder — it's a job that runs itself. Across Active Directory, service accounts, API keys, and machine credentials.</p>
+  <p class="body-text">Four-year-old credentials don't survive a 90-day rotation policy.</p>
+</div>
+
+<!-- SLIDE 6: Stage 2 — Flat network -->
+<div class="slide slide-section">
+  <p class="act-label">The kill chain — what would have been different</p>
+  <h2>No walls between <span class="red">office and factory.</span></h2>
+  <p class="body-text">JLR's "everything connected" architecture meant a compromised Jira account could reach manufacturing systems. No segmentation. No containment boundary.</p>
+  <p class="body-text"><strong>SELinux</strong> enforces mandatory access controls at the kernel level — processes can only reach what policy explicitly allows. <strong>firewalld</strong> with system roles enforces network segmentation as code. <strong>Event-Driven Ansible</strong> detects anomalous lateral movement and triggers automated micro-segmentation in real time.</p>
+  <p class="body-text">The attacker gets into the lobby. They don't get to the factory floor.</p>
+</div>
+
+<!-- SLIDE 7: Stage 3 — No continuous compliance -->
+<div class="slide slide-section">
+  <p class="act-label">The kill chain — what would have been different</p>
+  <h2><span class="red">Nobody was watching.</span></h2>
+  <p class="body-text">350 gigabytes of data exfiltrated — source code, vehicle logic, employee records. No file integrity monitoring caught it. No anomaly detection flagged it. The attackers had time and silence.</p>
+  <p class="body-text"><strong>OpenSCAP</strong> continuously evaluates compliance against 20 regulatory profiles — DISA STIG, CIS, PCI-DSS, NIST 800-171. <strong>AIDE</strong> monitors file integrity and flags unauthorized changes. <strong>Red Hat Satellite</strong> manages content and patching across the fleet — no system falls behind because someone forgot.</p>
+  <p class="body-text"><strong>Red Hat Insights</strong> — now <strong>Red Hat Lightspeed</strong> — provides AI-assisted vulnerability prioritization. Not just "you have 4,000 CVEs." Which ones matter <em>for your environment, right now</em>.</p>
+</div>
+
+<!-- SLIDE 8: Stage 4 — Total shutdown -->
+<div class="slide slide-section">
+  <p class="act-label">The kill chain — what would have been different</p>
+  <h2>They couldn't isolate. They had to <span class="red">disconnect everything.</span></h2>
+  <p class="body-text">Three factories. Thousands of supply chain partners. All offline because there was no way to contain the blast radius without pulling the plug on the entire operation.</p>
+  <p class="body-text"><strong>Red Hat OpenShift</strong> isolates workloads by design. Namespace boundaries. Network policies. Pod security. When a breach is detected, you contain the affected workloads — <strong>you don't shut down the plant.</strong></p>
+  <p class="body-text"><strong>Event-Driven Ansible</strong> automates the response: quarantine the compromised segment, rotate credentials, notify the SOC, preserve forensic evidence. Seconds, not weeks.</p>
+</div>
+
+<!-- SLIDE 9: The math -->
+<div class="slide slide-section">
+  <h2><span class="red">11 weeks</span> becomes <span class="gold">4 hours.</span></h2>
+  <div class="kill-chain">
+    <div class="kc-attack"><strong>Credentials stolen, never rotated</strong></div>
+    <div class="kc-arrow">→</div>
+    <div class="kc-counter"><strong>AAP</strong> enforces 90-day rotation</div>
+
+    <div class="kc-attack"><strong>Flat network, lateral movement</strong></div>
+    <div class="kc-arrow">→</div>
+    <div class="kc-counter"><strong>SELinux + EDA</strong> micro-segmentation</div>
+
+    <div class="kc-attack"><strong>350GB exfil undetected</strong></div>
+    <div class="kc-arrow">→</div>
+    <div class="kc-counter"><strong>OpenSCAP + AIDE + Lightspeed</strong></div>
+
+    <div class="kc-attack"><strong>Total shutdown — can't isolate</strong></div>
+    <div class="kc-arrow">→</div>
+    <div class="kc-counter"><strong>OpenShift</strong> workload isolation</div>
+
+    <div class="kc-attack"><strong>Legacy OS, no patching cadence</strong></div>
+    <div class="kc-arrow">→</div>
+    <div class="kc-counter"><strong>Satellite + AAP</strong> continuous lifecycle</div>
+  </div>
+  <p class="body-text" style="margin-top: 2.5rem;">One platform. Every layer of the defense. The breach still starts — but it doesn't finish.</p>
+</div>
+
+<!-- SLIDE 10: Standardize -->
+<div class="slide slide-section">
+  <p class="act-label">The foundation</p>
+  <h2>It starts with <span class="red">standardization.</span></h2>
+  <p class="body-text">JLR ran legacy systems — including Windows XP on the factory floor. Mixed OS estates create blind spots that attackers exploit and auditors flag.</p>
+  <p class="body-text"><strong>Red Hat Enterprise Linux</strong> is SAP's preferred OS for net new RISE with SAP deployments. 27 years of co-engineering. Extended Update Support aligned to SAP's lifecycle. Nearly 20 compliance profiles ship in the box.</p>
+  <p class="body-text">Standardize on RHEL and you get a defensible, auditable, automatable foundation. <strong>Stop managing snowflakes.</strong></p>
+</div>
+
+<!-- SLIDE 11: Expand — OHC -->
+<div class="slide slide-section">
+  <p class="act-label gold-label">What comes next</p>
+  <h2><span class="gold">Expand.</span></h2>
+  <p class="subtitle" style="margin-bottom: 2rem;">The platform that defends SAP is the same one that extends it.</p>
+  <p class="body-text"><strong>PI/PO is retiring.</strong> SAP's clean core strategy means custom code moves out of the ERP. Middleware gets replaced. Edge workloads need a home. AI inference needs infrastructure.</p>
+  <p class="body-text"><strong>Red Hat OpenShift</strong> runs SAP BTP side-by-side extensions. Hosts SAP Edge Integration Cell. Replaces PI/PO with containerized integration. Runs AI workloads alongside the core — on the same certified, hardened platform you already trust.</p>
+  <p class="body-text">Clean core stays clean because innovation happens on the platform, not in the ERP.</p>
+</div>
+
+<!-- SLIDE 12: One platform, three capabilities -->
+<div class="slide slide-section">
+  <h2>One platform. <span class="red">Three</span> capabilities.</h2>
+  <div class="pillars">
+    <div class="pillar">
+      <h3>Standardize</h3>
+      <p>RHEL as the SAP foundation. 27 years co-engineered. Preferred OS for RISE. Nearly 20 compliance profiles. Extended Update Support. Stop managing mixed estates.</p>
+    </div>
+    <div class="pillar">
+      <h3>Defend</h3>
+      <p>Satellite + AAP + OpenSCAP + EDA + Lightspeed. Continuous patching, continuous compliance, automated response. Not quarterly — continuously.</p>
+    </div>
+    <div class="pillar gold-top">
+      <h3>Expand</h3>
+      <p>OpenShift for BTP extensions, Edge Integration Cell, PI/PO replacement, AI workloads. The same hardened platform from core to edge to workshop.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 13: Closer -->
+<div class="slide slide-closer">
+  <p class="closer-line">The safest platform for SAP is also the <span class="red">most extensible.</span></p>
+  <p class="closer-line" style="font-weight: 300; font-size: clamp(1.2rem, 2vw, 1.6rem); color: var(--dim);">Come talk to Red Hat about what's next.</p>
+  <p class="footer-bar">Red Hat &nbsp;·&nbsp; Jim O'Donnell &nbsp;·&nbsp; Senior Specialist Solution Architect<br>SAP Sapphire Orlando &nbsp;·&nbsp; May 11–13, 2026</p>
+</div>
+
+<div class="nav-hint">scroll · arrow keys · page down</div>
+
+<script>
+document.addEventListener('keydown', (e) => {
+  const slides = document.querySelectorAll('.slide');
+  const vh = window.innerHeight;
+  const current = Math.round(window.scrollY / vh);
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+    e.preventDefault();
+    const next = Math.min(current + 1, slides.length - 1);
+    slides[next].scrollIntoView({ behavior: 'smooth' });
+  } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+    e.preventDefault();
+    const prev = Math.max(current - 1, 0);
+    slides[prev].scrollIntoView({ behavior: 'smooth' });
+  }
+});
+</script>
+</body>
+</html>
