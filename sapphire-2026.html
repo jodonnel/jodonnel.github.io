@@ -357,8 +357,8 @@ h2 {
   </div>
 </div>
 
-<!-- SLIDE 4: Human cost (audio slide) -->
-<div class="slide slide-section" id="slide-kermit">
+<!-- SLIDE 4: Human cost -->
+<div class="slide slide-section">
   <p class="act-label">Run — why we do what we do</p>
   <h2>The people <span class="red">downstream.</span></h2>
   <p class="body-text">One supplier laid off <strong>40 people — half their workforce.</strong> The breach didn't touch their network. They were just downstream of someone who got hit.</p>
@@ -416,8 +416,22 @@ h2 {
   <p class="body-text" style="margin-top: 2.5rem;">Six steps. Six countermeasures. The breach still starts — <strong>but it doesn't finish.</strong></p>
 </div>
 
-<!-- SLIDE 6: Standardize on RHEL -->
-<div class="slide slide-section">
+<!-- SLIDE 6.5: The tools the OS ships (audio slide) -->
+<div class="slide slide-section" id="slide-kermit">
+  <p class="act-label">Run — the tools the OS ships</p>
+  <h2>Not every OS is built for the <span class="red">mission.</span></h2>
+  <p class="body-text">Every Linux distribution makes a choice about what security tools come in the box. That choice determines what's standing between a webshell and the rest of the system before anyone writes custom policy.</p>
+  <p class="body-text"><strong>Red Hat Enterprise Linux</strong> ships <strong>SELinux</strong>. Mandatory access control, enforcing by default, label-based. Every process on the system runs under policy — including processes that shouldn't be running at all. Red Hat has shipped SAP-aware SELinux guidance for over a decade. <em>"Using SELinux for SAP HANA"</em> is official documentation.</p>
+  <p class="body-text"><strong>SUSE Linux Enterprise</strong> ships <strong>AppArmor</strong>. Opt-in, path-based, profile-driven. It protects what someone has written a profile for. For SAP workloads, the count of shipped profiles is zero.</p>
+  <div style="background: #000; border: 1px solid var(--border); padding: 1.5rem 2rem; font-family: 'Red Hat Mono', monospace; font-size: 0.95rem; max-width: 600px; margin: 2rem 0;">
+    <div style="color: var(--muted);">sles15:~ # aa-status | grep sap</div>
+    <div style="color: var(--muted);">sles15:~ #</div>
+  </div>
+  <p class="body-text" style="color: var(--muted); font-style: italic;">Nothing. No profiles. No policy. No mission-specific tool suite for the workload the customer bought the OS to run.</p>
+</div>
+
+<!-- SLIDE 7: Standardize on RHEL -->
+<div class="slide slide-section" id="slide-countermeasure">
   <p class="act-label">Run — the foundation</p>
   <h2>It starts with <span class="red">standardization.</span></h2>
   <p class="body-text"><strong>Red Hat Enterprise Linux</strong> is SAP's preferred OS for net new RISE deployments. 27 years of co-engineering. Extended Update Support aligned to SAP's release lifecycle.</p>
@@ -620,11 +634,10 @@ function updateCounter() {
 window.addEventListener('scroll', updateCounter);
 updateCounter();
 
-// Kermit audio on slide 4
+// Kermit audio on the "tools the OS ships" slide
 const kermitAudio = new Audio('bein-green-sapphire.mp3');
 kermitAudio.preload = 'auto';
 const kermitSlide = document.getElementById('slide-kermit');
-const nextSlide = document.getElementById('slide-countermeasure');
 let kermitPlayed = false;
 let audioUnlocked = false;
 
@@ -647,21 +660,9 @@ const kermitObserver = new IntersectionObserver((entries) => {
       kermitPlayed = true;
       kermitAudio.currentTime = 0;
       kermitAudio.play().catch(e => console.warn('audio blocked:', e));
-      // Fade to black starting at 19s (song fades 20.73-21.03)
-      setTimeout(() => {
-        kermitSlide.style.transition = 'opacity 2s ease';
-        kermitSlide.style.opacity = '0';
-      }, 19000);
-      // After fade complete + 0.7s pause, snap to next slide
-      setTimeout(() => {
-        nextSlide.scrollIntoView({ behavior: 'auto' });
-        // Reset opacity for if they scroll back
-        kermitSlide.style.transition = 'none';
-        kermitSlide.style.opacity = '1';
-      }, 21700);
     }
   });
-}, { threshold: 0.8 });
+}, { threshold: 0.6 });
 kermitObserver.observe(kermitSlide);
 </script>
 </body>
