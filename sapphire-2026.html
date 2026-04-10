@@ -15,7 +15,7 @@
   --dim: #BBBBAA;
   --red: #EE0000;
   --gold: #F0AB00;
-  --green: #63D471;
+  --green: #008FD3;
   --blue: #4A90D9;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -357,8 +357,8 @@ h2 {
   </div>
 </div>
 
-<!-- SLIDE 4: Human cost -->
-<div class="slide slide-section">
+<!-- SLIDE 4: Human cost (audio slide) -->
+<div class="slide slide-section" id="slide-kermit">
   <p class="act-label">Run — why we do what we do</p>
   <h2>The people who <span class="red">paid for it.</span></h2>
   <p class="body-text">One JLR supplier laid off <strong>40 people — half their workforce.</strong> They didn't skip the patch. They didn't leave the password unchanged for four years. They were just downstream.</p>
@@ -380,7 +380,7 @@ h2 {
 </div>
 
 <!-- SLIDE 5: Transition -->
-<div class="slide slide-transition">
+<div class="slide slide-transition" id="slide-countermeasure">
   <p class="transition-line">"Every step in that kill chain had a known countermeasure. Not exotic. Not expensive. <strong style="color: var(--text); font-style: normal;">Just not in place.</strong>"</p>
 </div>
 
@@ -619,6 +619,34 @@ function updateCounter() {
 }
 window.addEventListener('scroll', updateCounter);
 updateCounter();
+
+// Kermit audio on slide 4
+const kermitAudio = new Audio('bein-green-sapphire.mp3');
+const kermitSlide = document.getElementById('slide-kermit');
+const nextSlide = document.getElementById('slide-countermeasure');
+let kermitPlayed = false;
+
+const kermitObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !kermitPlayed) {
+      kermitPlayed = true;
+      kermitAudio.play();
+      // Fade to black starting at 19s (song fades 20.73-21.03)
+      setTimeout(() => {
+        kermitSlide.style.transition = 'opacity 2s ease';
+        kermitSlide.style.opacity = '0';
+      }, 19000);
+      // After fade complete + 0.7s pause, snap to next slide
+      setTimeout(() => {
+        nextSlide.scrollIntoView({ behavior: 'auto' });
+        // Reset opacity for if they scroll back
+        kermitSlide.style.transition = 'none';
+        kermitSlide.style.opacity = '1';
+      }, 21700);
+    }
+  });
+}, { threshold: 0.8 });
+kermitObserver.observe(kermitSlide);
 </script>
 </body>
 </html>
