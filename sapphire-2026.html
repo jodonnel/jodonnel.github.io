@@ -14,9 +14,9 @@
   --text: #F0F4F8;
   --dim: #BBBBAA;
   --red: #EE0000;
-  --accent: #EE0000;
   --gold: #F0AB00;
-  --warn: #CC0000;
+  --green: #63D471;
+  --blue: #4A90D9;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-snap-type: y mandatory; overflow-y: scroll; }
@@ -46,6 +46,20 @@ body { background: var(--bg); color: var(--text); font-family: 'Red Hat Display'
 .slide-closer { text-align: center; align-items: center; }
 .slide-transition { align-items: center; text-align: center; }
 
+/* Red Hat logo watermark — every slide */
+.slide::before {
+  content: '';
+  position: absolute;
+  bottom: 3vh;
+  right: 4vw;
+  width: 80px;
+  height: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 613 145'%3E%3Cpath fill='%23EE0000' d='M127.47 83.49c12.51 0 30.61-2.58 30.61-17.46a14 14 0 0 0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89 8.69 103.76.5 97.51.5 91.69.5 90 8 83.06 8c-6.68 0-11.64-5.6-17.89-5.6-6 0-9.91 4.09-12.93 12.5 0 0-8.41 23.72-9.49 27.16a6.43 6.43 0 0 0-.22 1.94c0 9.22 36.3 39.45 84.94 39.45M160 72.07c1.73 8.19 1.73 9.05 1.73 10.13 0 14-15.74 21.77-36.43 21.77C78.54 104 37.58 76.6 37.58 58.49a18.45 18.45 0 0 1 1.51-7.33C22.27 52 .5 55 .5 74.22c0 31.48 74.59 70.28 133.65 70.28 45.28 0 56.7-20.48 56.7-36.65 0-12.72-11-27.16-30.83-35.78'/%3E%3Cpath fill='%23EE0000' d='M160 72.07c1.73 8.19 1.73 9.05 1.73 10.13 0 14-15.74 21.77-36.43 21.77C78.54 104 37.58 76.6 37.58 58.49a18.45 18.45 0 0 1 1.51-7.33C22.27 52 .5 55 .5 74.22c0 31.48 74.59 70.28 133.65 70.28 45.28 0 56.7-20.48 56.7-36.65 0-12.72-11-27.16-30.83-35.78'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.4;
+}
+
 h1 {
   font-size: clamp(3rem, 7vw, 6rem);
   font-weight: 900;
@@ -60,6 +74,7 @@ h2 {
 }
 .red { color: var(--red); }
 .gold { color: var(--gold); }
+.green { color: var(--green); }
 
 .subtitle {
   font-family: 'Red Hat Text', sans-serif;
@@ -148,13 +163,6 @@ h2 {
   max-width: 600px;
   line-height: 1.4;
 }
-.transition-attr {
-  font-family: 'Red Hat Mono', monospace;
-  font-size: 0.8rem;
-  color: var(--muted);
-  margin-top: 1.5rem;
-  opacity: 0.6;
-}
 
 .pillars {
   display: grid;
@@ -179,6 +187,7 @@ h2 {
   line-height: 1.7;
 }
 .pillar.gold-top { border-top-color: var(--gold); }
+.pillar.green-top { border-top-color: var(--green); }
 
 .act-label {
   font-family: 'Red Hat Mono', monospace;
@@ -189,6 +198,7 @@ h2 {
   margin-bottom: 1.5rem;
 }
 .act-label.gold-label { color: var(--gold); }
+.act-label.green-label { color: var(--green); }
 
 .closer-line {
   font-size: clamp(1.5rem, 3.5vw, 2.5rem);
@@ -250,12 +260,37 @@ h2 {
 }
 .timeline-text strong { color: var(--text); }
 
+.day-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 2rem;
+  max-width: 800px;
+  margin: 2rem 0;
+}
+.day-label {
+  font-family: 'Red Hat Mono', monospace;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--gold);
+  padding-top: 0.3rem;
+}
+.day-content {
+  font-family: 'Red Hat Text', sans-serif;
+  font-size: 1.05rem;
+  color: var(--dim);
+  line-height: 1.7;
+  padding: 0.3rem 0 1.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.day-content strong { color: var(--text); }
+
 @media (max-width: 768px) {
   .pillars { grid-template-columns: 1fr; }
   .kill-chain { grid-template-columns: 1fr; gap: 0.3rem; }
   .kc-attack { text-align: left; }
   .kc-arrow { display: none; }
   .stats-row { gap: 2rem; }
+  .day-grid { grid-template-columns: 1fr; }
 }
 @media print {
   .slide { page-break-after: always; min-height: 100vh; }
@@ -267,174 +302,273 @@ h2 {
 
 <!-- SLIDE 1: Cover -->
 <div class="slide slide-cover">
-  <h1><span class="red">Run.</span> Simplify. <span class="gold">Expand.</span></h1>
-  <p class="subtitle">The open platform journey for SAP — standardize, defend, and extend on a single trusted foundation.</p>
+  <h1><span class="red">Run.</span> <span class="gold">Simplify.</span> <span class="green">Expand.</span></h1>
+  <p class="subtitle">The open platform journey for SAP — defend what you run, automate what slows you down, and extend into workloads that don't exist yet.</p>
   <p class="meta">SAP Sapphire Orlando &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Red Hat</p>
 </div>
 
 <!-- SLIDE 2: The cost of not acting -->
 <div class="slide slide-section">
-  <h2>August 31, <span class="red">2025.</span></h2>
-  <p class="body-text">A major automotive manufacturer — <strong>Jaguar Land Rover</strong> — discovers that attackers have been inside their network. Credentials stolen in 2021. <strong>Never rotated.</strong></p>
-  <p class="body-text">What follows is the most expensive cybersecurity incident in UK manufacturing history.</p>
+  <p class="act-label">Run — the cost of standing still</p>
+  <h2>Anatomy of a <span class="red">major breach.</span></h2>
+  <p class="body-text"><strong>Jaguar Land Rover</strong> — two attack vectors, one outcome. Credentials stolen in 2021 and never rotated opened the door. A critical SAP vulnerability left unpatched for five months blew it off the hinges.</p>
+  <p class="body-text">The result: the most expensive cyberattack in British history.</p>
   <div class="stats-row">
     <div class="stat-block">
-      <div class="stat-hero">11 weeks</div>
-      <div class="stat-label">to full recovery</div>
-    </div>
-    <div class="stat-block">
-      <div class="stat-hero">£300M+</div>
-      <div class="stat-label">direct cost to JLR</div>
-    </div>
-    <div class="stat-block">
       <div class="stat-hero">£1.9B</div>
-      <div class="stat-label">UK economy impact</div>
+      <div class="stat-label">total UK economic impact</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-hero">£20M</div>
+      <div class="stat-label">per day of shutdown</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-hero">5,000+</div>
+      <div class="stat-label">UK organizations affected</div>
     </div>
   </div>
-  <p class="body-text">The Bank of England cited this incident in its Q3 GDP report. <strong>One breach. National consequences.</strong></p>
 </div>
 
-<!-- SLIDE 3: How it happened -->
+<!-- SLIDE 3: How it happened — two vectors -->
 <div class="slide slide-section">
+  <p class="act-label">Run — two vectors, one outcome</p>
   <h2>How it <span class="red">happened.</span></h2>
   <div class="timeline">
     <div class="timeline-event">
       <div class="timeline-date">2021 — Credentials stolen</div>
-      <div class="timeline-text">Infostealer malware harvests employee credentials from browsers. <strong>The credentials sit in attacker hands for four years.</strong></div>
+      <div class="timeline-text">Infostealer malware harvests Jira credentials. <strong>They sit in attacker hands for four years. Never rotated.</strong></div>
     </div>
     <div class="timeline-event">
-      <div class="timeline-date">August 2025 — Access</div>
-      <div class="timeline-text">Attackers authenticate to JLR's Jira server using stolen third-party credentials. They find host files, DNS entries, internal domains. <strong>The map of the entire network.</strong></div>
+      <div class="timeline-date">March 2025 — Reconnaissance</div>
+      <div class="timeline-text">Hellcat ransomware group uses stolen Jira credentials to map the internal network. Host files, DNS entries, SAP system landscape. <strong>They know what's running and where.</strong></div>
     </div>
     <div class="timeline-event">
-      <div class="timeline-date">Days later — Lateral movement</div>
-      <div class="timeline-text">Flat network. No segmentation. Corporate IT to manufacturing systems — <strong>no barrier between the office and the factory floor.</strong></div>
+      <div class="timeline-date">April 2025 — SAP releases a patch</div>
+      <div class="timeline-text"><strong>CVE-2025-31324</strong> — CVSS 10.0. Unauthenticated file upload in SAP NetWeaver Visual Composer. SAP publishes the fix. <strong>JLR doesn't apply it.</strong></div>
     </div>
     <div class="timeline-event">
-      <div class="timeline-date">Undetected — 350GB exfiltrated</div>
-      <div class="timeline-text">Source code. Vehicle system logic. Authentication backends. Employee data. <strong>Nobody noticed.</strong></div>
+      <div class="timeline-date">August 2025 — The kill shot</div>
+      <div class="timeline-text">Attackers exploit the unpatched endpoint. HTTP POST to <code style="color:var(--red);">/irj/portal</code> → webshell deployed → full system access. <strong>No credentials needed. No phishing. Just an open door.</strong></div>
     </div>
     <div class="timeline-event">
       <div class="timeline-date">September 2025 — Total shutdown</div>
-      <div class="timeline-text">All three UK plants offline. Solihull. Wolverhampton. Halewood. They couldn't isolate the breach — <strong>they had to disconnect everything.</strong></div>
+      <div class="timeline-text">Three UK plants offline. 350GB exfiltrated. 5,000+ supply chain organizations disrupted. <strong>£20 million per day in losses.</strong></div>
     </div>
   </div>
 </div>
 
 <!-- SLIDE 4: Transition -->
 <div class="slide slide-transition">
-  <p class="transition-line">"One missed vulnerability doesn't have to become an 11-week shutdown. Not if every step after it is <strong style="color: var(--text); font-style: normal;">harder, slower, and observed.</strong>"</p>
+  <p class="transition-line">"Every step in that kill chain had a known countermeasure. Not exotic. Not expensive. <strong style="color: var(--text); font-style: normal;">Just not in place.</strong>"</p>
 </div>
 
-<!-- SLIDE 5: Stage 1 — Credentials -->
+<!-- SLIDE 5: The counter-narrative -->
 <div class="slide slide-section">
-  <p class="act-label">The kill chain — what would have been different</p>
-  <h2>Credentials sat for <span class="red">four years.</span></h2>
-  <p class="body-text">Stolen in 2021. Used in 2025. The simplest control — <strong>credential rotation</strong> — would have invalidated them long before the attackers returned.</p>
-  <p class="body-text"><strong>Red Hat Ansible Automation Platform</strong> enforces credential lifecycle policies across the enterprise. Rotation isn't a reminder — it's a job that runs itself. Across Active Directory, service accounts, API keys, and machine credentials.</p>
-  <p class="body-text">Four-year-old credentials don't survive a 90-day rotation policy.</p>
-</div>
-
-<!-- SLIDE 6: Stage 2 — Flat network -->
-<div class="slide slide-section">
-  <p class="act-label">The kill chain — what would have been different</p>
-  <h2>No walls between <span class="red">office and factory.</span></h2>
-  <p class="body-text">JLR's "everything connected" architecture meant a compromised Jira account could reach manufacturing systems. No segmentation. No containment boundary.</p>
-  <p class="body-text"><strong>SELinux</strong> enforces mandatory access controls at the kernel level — processes can only reach what policy explicitly allows. <strong>firewalld</strong> with system roles enforces network segmentation as code. <strong>Event-Driven Ansible</strong> detects anomalous lateral movement and triggers automated micro-segmentation in real time.</p>
-  <p class="body-text">The attacker gets into the lobby. They don't get to the factory floor.</p>
-</div>
-
-<!-- SLIDE 7: Stage 3 — No continuous compliance -->
-<div class="slide slide-section">
-  <p class="act-label">The kill chain — what would have been different</p>
-  <h2><span class="red">Nobody was watching.</span></h2>
-  <p class="body-text">350 gigabytes of data exfiltrated — source code, vehicle logic, employee records. No file integrity monitoring caught it. No anomaly detection flagged it. The attackers had time and silence.</p>
-  <p class="body-text"><strong>OpenSCAP</strong> continuously evaluates compliance against 20 regulatory profiles — DISA STIG, CIS, PCI-DSS, NIST 800-171. <strong>AIDE</strong> monitors file integrity and flags unauthorized changes. <strong>Red Hat Satellite</strong> manages content and patching across the fleet — no system falls behind because someone forgot.</p>
-  <p class="body-text"><strong>Red Hat Insights</strong> — now <strong>Red Hat Lightspeed</strong> — provides AI-assisted vulnerability prioritization. Not just "you have 4,000 CVEs." Which ones matter <em>for your environment, right now</em>.</p>
-</div>
-
-<!-- SLIDE 8: Stage 4 — Total shutdown -->
-<div class="slide slide-section">
-  <p class="act-label">The kill chain — what would have been different</p>
-  <h2>They couldn't isolate. They had to <span class="red">disconnect everything.</span></h2>
-  <p class="body-text">Three factories. Thousands of supply chain partners. All offline because there was no way to contain the blast radius without pulling the plug on the entire operation.</p>
-  <p class="body-text"><strong>Red Hat OpenShift</strong> isolates workloads by design. Namespace boundaries. Network policies. Pod security. When a breach is detected, you contain the affected workloads — <strong>you don't shut down the plant.</strong></p>
-  <p class="body-text"><strong>Event-Driven Ansible</strong> automates the response: quarantine the compromised segment, rotate credentials, notify the SOC, preserve forensic evidence. Seconds, not weeks.</p>
-</div>
-
-<!-- SLIDE 9: The math -->
-<div class="slide slide-section">
-  <h2><span class="red">11 weeks</span> becomes <span class="gold">4 hours.</span></h2>
+  <p class="act-label">Run — the counter-narrative</p>
+  <h2>What <span class="red">would have</span> been different.</h2>
   <div class="kill-chain">
-    <div class="kc-attack"><strong>Credentials stolen, never rotated</strong></div>
+    <div class="kc-attack"><strong>Credentials stolen 2021, never rotated</strong></div>
     <div class="kc-arrow">→</div>
-    <div class="kc-counter"><strong>AAP</strong> enforces 90-day rotation</div>
+    <div class="kc-counter"><strong>AAP</strong> enforces 90-day rotation policy</div>
 
-    <div class="kc-attack"><strong>Flat network, lateral movement</strong></div>
+    <div class="kc-attack"><strong>Jira recon maps the SAP landscape</strong></div>
     <div class="kc-arrow">→</div>
-    <div class="kc-counter"><strong>SELinux + EDA</strong> micro-segmentation</div>
+    <div class="kc-counter"><strong>IdM + centralized logging</strong> flags anomalous access</div>
 
-    <div class="kc-attack"><strong>350GB exfil undetected</strong></div>
+    <div class="kc-attack"><strong>CVE-2025-31324 unpatched for 5 months</strong></div>
     <div class="kc-arrow">→</div>
-    <div class="kc-counter"><strong>OpenSCAP + AIDE + Lightspeed</strong></div>
+    <div class="kc-counter"><strong>Satellite + Insights</strong> flags CVE in April, not August</div>
 
-    <div class="kc-attack"><strong>Total shutdown — can't isolate</strong></div>
+    <div class="kc-attack"><strong>Webshell executes on unconfined OS</strong></div>
     <div class="kc-arrow">→</div>
-    <div class="kc-counter"><strong>OpenShift</strong> workload isolation</div>
+    <div class="kc-counter"><strong>SELinux enforcing</strong> blocks execution outside policy</div>
 
-    <div class="kc-attack"><strong>Legacy OS, no patching cadence</strong></div>
+    <div class="kc-attack"><strong>Lateral movement to factory floor</strong></div>
     <div class="kc-arrow">→</div>
-    <div class="kc-counter"><strong>Satellite + AAP</strong> continuous lifecycle</div>
+    <div class="kc-counter"><strong>firewalld zones + OpenShift</strong> network segmentation</div>
+
+    <div class="kc-attack"><strong>350GB exfil, total shutdown</strong></div>
+    <div class="kc-arrow">→</div>
+    <div class="kc-counter"><strong>AIDE + OpenSCAP</strong> detects drift within minutes</div>
   </div>
-  <p class="body-text" style="margin-top: 2.5rem;">One platform. Every layer of the defense. The breach still starts — but it doesn't finish.</p>
+  <p class="body-text" style="margin-top: 2.5rem;">Six steps. Six countermeasures. The breach still starts — <strong>but it doesn't finish.</strong></p>
 </div>
 
-<!-- SLIDE 10: Standardize -->
+<!-- SLIDE 6: Standardize on RHEL -->
 <div class="slide slide-section">
-  <p class="act-label">The foundation</p>
+  <p class="act-label">Run — the foundation</p>
   <h2>It starts with <span class="red">standardization.</span></h2>
-  <p class="body-text">JLR ran legacy systems — including Windows XP on the factory floor. Mixed OS estates create blind spots that attackers exploit and auditors flag.</p>
-  <p class="body-text"><strong>Red Hat Enterprise Linux</strong> is SAP's preferred OS for net new RISE with SAP deployments. 27 years of co-engineering. Extended Update Support aligned to SAP's lifecycle. Nearly 20 compliance profiles ship in the box.</p>
-  <p class="body-text">Standardize on RHEL and you get a defensible, auditable, automatable foundation. <strong>Stop managing snowflakes.</strong></p>
+  <p class="body-text"><strong>Red Hat Enterprise Linux</strong> is SAP's preferred OS for net new RISE deployments. 27 years of co-engineering. Extended Update Support aligned to SAP's release lifecycle.</p>
+  <p class="body-text">RHEL 10 was certified for SAP HANA in February 2026 — SAP supports that combination through <strong>2035</strong>. That's the longest SAP HANA support window available on any operating system today. When you're planning a platform that needs to run for a decade, the lifecycle math matters.</p>
+  <p class="body-text">Nearly 20 compliance profiles ship in the box: DISA STIG, CIS, NIST 800-53, PCI-DSS. No additional purchase. Standardize on RHEL and you get a defensible, auditable, automatable foundation. <strong>Stop managing snowflakes. Start managing policy.</strong></p>
 </div>
 
-<!-- SLIDE 11: Expand — OHC -->
+<!-- SLIDE 7: Simplify — the thesis -->
 <div class="slide slide-section">
-  <p class="act-label gold-label">What comes next</p>
-  <h2><span class="gold">Expand.</span></h2>
-  <p class="subtitle" style="margin-bottom: 2rem;">The platform that defends SAP is the same one that extends it.</p>
-  <p class="body-text"><strong>PI/PO is retiring.</strong> SAP's clean core strategy means custom code moves out of the ERP. Middleware gets replaced. Edge workloads need a home. AI inference needs infrastructure.</p>
-  <p class="body-text"><strong>Red Hat OpenShift</strong> runs SAP BTP side-by-side extensions. Hosts SAP Edge Integration Cell. Replaces PI/PO with containerized integration. Runs AI workloads alongside the core — on the same certified, hardened platform you already trust.</p>
-  <p class="body-text">Clean core stays clean because innovation happens on the platform, not in the ERP.</p>
+  <p class="act-label gold-label">Simplify — automation that closes the loop</p>
+  <h2>The platform <span class="gold">isn't enough.</span></h2>
+  <p class="body-text">A hardened OS is table stakes. What breaks SAP operations isn't the platform — it's the <strong>manual work around the platform.</strong> Patching cycles that slip. Drift that accumulates. Compliance checks that happen quarterly instead of continuously.</p>
+  <p class="body-text">The question isn't whether you have the tools. It's whether <strong>the tools run themselves.</strong></p>
 </div>
 
-<!-- SLIDE 12: One platform, three capabilities -->
+<!-- SLIDE 8: Simplify — Day 0 / 1 / 2 -->
 <div class="slide slide-section">
-  <h2>One platform. <span class="red">Three</span> capabilities.</h2>
+  <p class="act-label gold-label">Simplify — the operational model</p>
+  <h2>Day 0. Day 1. <span class="gold">Day 2+.</span></h2>
+  <div class="day-grid">
+    <div class="day-label">0</div>
+    <div class="day-content"><strong>Image mode Ansible</strong> builds a SAP-certified, compliance-scanned RHEL image before it boots. Kernel tunables, SAP HANA parameters, security profiles — baked in, not bolted on. The image IS the documentation.</div>
+
+    <div class="day-label">1</div>
+    <div class="day-content"><strong>Ansible Playbooks for SAP</strong> install HANA, apply SAP notes, validate the configuration, and register with Satellite. What used to be a two-week Basis engagement becomes a workflow template that runs in minutes.</div>
+
+    <div class="day-label">2+</div>
+    <div class="day-content"><strong>Red Hat Ansible Automation Platform</strong> keeps the hygiene going — patching, drift detection, credential rotation, compliance re-scan. Not quarterly. <strong>Continuously.</strong> The 3-person Basis team manages the growing landscape because the automation doesn't sleep.</div>
+  </div>
+</div>
+
+<!-- SLIDE 9: Simplify — what automation replaces -->
+<div class="slide slide-section">
+  <p class="act-label gold-label">Simplify — the math</p>
+  <h2>What <span class="gold">automation</span> replaces.</h2>
+  <div class="stats-row">
+    <div class="stat-block">
+      <div class="stat-hero" style="color: var(--gold);">90%</div>
+      <div class="stat-label">reduction in manual SAP provisioning time</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-hero" style="color: var(--gold);">0</div>
+      <div class="stat-label">configuration drift between environments</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-hero" style="color: var(--gold);">24/7</div>
+      <div class="stat-label">compliance posture — not quarterly audits</div>
+    </div>
+  </div>
+  <p class="body-text"><strong>Red Hat Satellite</strong> manages content and patching across the fleet. <strong>Red Hat Insights</strong> provides vulnerability prioritization — not just "you have 4,000 CVEs," but which ones matter for your SAP environment, right now.</p>
+  <p class="body-text">Simplify isn't a product. It's the operational model where <strong>defense and maintenance are the same workflow.</strong></p>
+</div>
+
+<!-- SLIDE 10: Transition to Expand -->
+<div class="slide slide-transition">
+  <p class="transition-line">"The platform that defends SAP is the same one that <strong style="color: var(--green); font-style: normal;">extends it.</strong>"</p>
+</div>
+
+<!-- SLIDE 11: Expand — Clean core -->
+<div class="slide slide-section">
+  <p class="act-label green-label">Expand — what comes next</p>
+  <h2>Clean core stays <span class="green">clean.</span></h2>
+  <p class="body-text"><strong>PI/PO is retiring.</strong> SAP's clean core strategy means custom code moves out of the ERP. Middleware gets replaced. New workloads need a home that isn't inside the core.</p>
+  <p class="body-text"><strong>Red Hat OpenShift</strong> runs SAP BTP side-by-side extensions. Hosts SAP Edge Integration Cell. Replaces PI/PO with containerized integration. Innovation happens on the platform, not in the ERP — and it runs on the same certified, hardened RHEL foundation you already trust.</p>
+</div>
+
+<!-- SLIDE 12: Expand — IT/OT convergence -->
+<div class="slide slide-section">
+  <p class="act-label green-label">Expand — beyond the ERP</p>
+  <h2>IT/OT <span class="green">convergence.</span></h2>
+  <p class="body-text">SAP is one source system. Your factories, warehouses, hospitals, and retail locations have hundreds more — devices, sensors, building management, edge compute. The data flows in both directions.</p>
+  <p class="body-text"><strong>OpenShift is source-agnostic.</strong> SAP connects through EIC and BTP. Other systems connect natively — MQTT for devices, REST for SaaS, OPC-UA for industrial. The platform doesn't care what the source is. It cares that every connection is secured, observed, and automated.</p>
+  <p class="body-text">The same architecture from core to edge. <strong>One platform for everything that touches your business.</strong></p>
+</div>
+
+<!-- SLIDE 13: Expand — The edge operations gap -->
+<div class="slide slide-section">
+  <p class="act-label green-label">Expand — the operations gap at the edge</p>
+  <h2>The edge is <span class="green">already here.</span> The operations <span class="red">aren't.</span></h2>
+  <p class="body-text">A 2026 survey of 219 IT decision-makers across 12 industries found that edge AI has moved from pilot to production. But the operations haven't kept up.</p>
+  <div class="stats-row">
+    <div class="stat-block">
+      <div class="stat-hero" style="color: var(--red);">47%</div>
+      <div class="stat-label">cannot automatically roll back a failed model update</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-hero" style="color: var(--red);">20%</div>
+      <div class="stat-label">have zero model governance at the edge</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-hero" style="color: var(--red);">57%</div>
+      <div class="stat-label">experience monthly connectivity disruptions</div>
+    </div>
+  </div>
+  <p class="body-text">The organizations that adopted <strong>Kubernetes for edge deployment outperform on every operational metric</strong> — 2x more likely to monitor model performance, 2.6x more likely to alert on drift, half as likely to have zero governance.</p>
+  <p class="body-text">Among edge Kubernetes deployers: <strong>OpenShift is #2 at 37%</strong>, behind only EKS Anywhere. K3s and RKE2 combined account for 45% — but in lightweight distributions designed for disconnected environments, <strong>Red Hat Device Edge with MicroShift</strong> is purpose-built for autonomous operation, local failover, and graceful handling of interrupted updates.</p>
+  <p class="body-text" style="font-family: 'Red Hat Mono', monospace; font-size: 0.75rem; color: var(--muted);">Source: "State of Edge AI: Where the Models Meet the Metal" — SUSE, 2026</p>
+</div>
+
+<!-- SLIDE 14: Expand — Intelligence layer (was 13) -->
+<div class="slide slide-section">
+  <p class="act-label green-label">Expand — intelligence at the edge</p>
+  <h2>Not every event needs to go <span class="green">upstream.</span></h2>
+  <p class="body-text">A smart platform reduces noise before it reaches SAP. Three layers of intelligence, each optional, each additive:</p>
+  <div class="pillars">
+    <div class="pillar green-top">
+      <h3>Event-Driven Ansible</h3>
+      <p>Deterministic. Rules, batching, dedup, throttle. Known patterns get handled automatically. Already running on your cluster — it's part of AAP.</p>
+    </div>
+    <div class="pillar green-top">
+      <h3>Red Hat OpenShift AI</h3>
+      <p>Nondeterministic. Anomaly detection, event consolidation, pattern recognition. The things rules can't catch.</p>
+    </div>
+    <div class="pillar green-top">
+      <h3>IBM Granite</h3>
+      <p>Local-first inference. Triage, classification, summarization — on-premises, air-gapped if needed. No data leaves the building.</p>
+    </div>
+  </div>
+  <p class="body-text" style="margin-top: 2rem;">Only what matters goes upstream. Transaction volume drops. Signal-to-noise improves. <strong>SAP gets cleaner data, not more data.</strong></p>
+</div>
+
+<!-- SLIDE 14: One platform, three capabilities -->
+<div class="slide slide-section">
+  <h2>One platform. <span class="red">Three</span> journeys.</h2>
   <div class="pillars">
     <div class="pillar">
-      <h3>Standardize</h3>
-      <p>RHEL as the SAP foundation. 27 years co-engineered. Preferred OS for RISE. Nearly 20 compliance profiles. Extended Update Support. Stop managing mixed estates.</p>
-    </div>
-    <div class="pillar">
-      <h3>Defend</h3>
-      <p>Satellite + AAP + OpenSCAP + EDA + Lightspeed. Continuous patching, continuous compliance, automated response. Not quarterly — continuously.</p>
+      <h3><span class="red">Run</span></h3>
+      <p>RHEL as the SAP foundation. 27 years co-engineered. Certified for SAP HANA through 2035. Nearly 20 compliance profiles. Hardened, auditable, defensible. The breach stops here.</p>
     </div>
     <div class="pillar gold-top">
-      <h3>Expand</h3>
-      <p>OpenShift for BTP extensions, Edge Integration Cell, PI/PO replacement, AI workloads. The same hardened platform from core to edge to workshop.</p>
+      <h3><span class="gold">Simplify</span></h3>
+      <p>AAP + Satellite + Insights. Day 0 images, Day 1 installs, Day 2+ automation. Patching, drift, rotation, compliance — continuously, not quarterly. The Basis team sleeps.</p>
+    </div>
+    <div class="pillar green-top">
+      <h3><span class="green">Expand</span></h3>
+      <p>OpenShift for BTP extensions, Edge Integration Cell, PI/PO replacement, IT/OT convergence, AI workloads. The same hardened platform from core to edge to factory floor.</p>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 13: Closer -->
+<!-- SLIDE 16: Sources -->
+<div class="slide slide-section">
+  <p class="act-label">Sources</p>
+  <h2>References.</h2>
+  <div style="columns: 2; column-gap: 3rem; max-width: 1000px;">
+    <p class="body-text" style="font-size: 0.85rem; line-height: 2; margin-bottom: 0.5rem;"><strong style="color: var(--red);">JLR Breach</strong></p>
+    <p class="body-text" style="font-size: 0.75rem; line-height: 1.8; margin-bottom: 0.3rem;">[1] "Jaguar Land Rover hack stalls factories" — <em>The Guardian</em>, Sep 20, 2025</p>
+    <p class="body-text" style="font-size: 0.75rem; line-height: 1.8; margin-bottom: 0.3rem;">[2] "JLR attack costs could surpass $1.5 billion" — <em>Safe Security</em>, FAIR-MAM analysis, 2025</p>
+    <p class="body-text" style="font-size: 0.75rem; line-height: 1.8; margin-bottom: 0.3rem;">[3] "JLR cyberattack: UK's costliest, $2.5B breach" — <em>Cybersecurity Dive</em>, 2025</p>
+    <p class="body-text" style="font-size: 0.75rem; line-height: 1.8; margin-bottom: 0.3rem;">[4] "Manufacturing cybersecurity: lessons from JLR" — <em>Gurucul</em>, 2025</p>
+    <p class="body-text" style="font-size: 0.75rem; line-height: 1.8; margin-bottom: 0.3rem;">[5] "JLR cyberattack further exposes production fragility" — <em>Automotive Manufacturing Solutions</em>, 2025</p>
+    <p class="body-text" style="font-size: 0.75rem; line-height: 1.8; margin-bottom: 1.5rem;">[6] "Jaguar Land Rover cyberattack 2025" — <em>FireCompass</em>, 2025</p>
+    <p class="body-text" style="font-size: 0.85rem; line-height: 2; margin-bottom: 0.5rem;"><strong style="color: var(--red);">CVE-2025-31324</strong></p>
+    <p class="body-text" style="font-size: 0.75rem; line-height: 1.8; margin-bottom: 0.3rem;">[7] SAP Security Note — CVE-2025-31324, CVSS 10.0</p>
+    <p class="body-text" style="font-size: 0.75rem; line-height: 1.8; margin-bottom: 1.5rem;">[8] Onapsis threat intelligence — SAP NetWeaver exploitation analysis, 2025</p>
+    <p class="body-text" style="font-size: 0.85rem; line-height: 2; margin-bottom: 0.5rem;"><strong style="color: var(--red);">Red Hat + SAP</strong></p>
+    <p class="body-text" style="font-size: 0.75rem; line-height: 1.8; margin-bottom: 0.3rem;">[9] "Using SELinux for SAP HANA" — <em>Red Hat Documentation</em>, RHEL 9</p>
+    <p class="body-text" style="font-size: 0.75rem; line-height: 1.8; margin-bottom: 0.3rem;">[10] "Red Hat Insights for SAP HANA" — <em>Red Hat Blog</em></p>
+    <p class="body-text" style="font-size: 0.75rem; line-height: 1.8; margin-bottom: 0.3rem;">[11] SAP PAM — HANA Platform Edition 2.0 OS certifications, extracted 2026-04-09</p>
+    <p class="body-text" style="font-size: 0.75rem; line-height: 1.8; margin-bottom: 1.5rem;">[12] "SELinux vs AppArmor: comparative deep dive" — <em>DOHost</em>, 2025</p>
+    <p class="body-text" style="font-size: 0.85rem; line-height: 2; margin-bottom: 0.5rem;"><strong style="color: var(--green);">Edge AI</strong></p>
+    <p class="body-text" style="font-size: 0.75rem; line-height: 1.8; margin-bottom: 0.3rem;">[13] "State of Edge AI: Where the Models Meet the Metal" — <em>SUSE</em>, 2026</p>
+  </div>
+</div>
+
+<!-- SLIDE 17: Closer -->
 <div class="slide slide-closer">
-  <p class="closer-line">The safest platform for SAP is also the <span class="red">most extensible.</span></p>
-  <p class="closer-line" style="font-weight: 300; font-size: clamp(1.2rem, 2vw, 1.6rem); color: var(--dim);">Come talk to Red Hat about what's next.</p>
+  <p class="closer-line">The safest platform for SAP is also the <span class="green">most extensible.</span></p>
+  <p class="closer-line" style="font-weight: 300; font-size: clamp(1.2rem, 2vw, 1.6rem); color: var(--dim);">Come see it live at the Red Hat booth.</p>
   <p class="footer-bar">Red Hat &nbsp;·&nbsp; Jim O'Donnell &nbsp;·&nbsp; Senior Specialist Solution Architect<br>SAP Sapphire Orlando &nbsp;·&nbsp; May 11–13, 2026</p>
 </div>
 
-<div class="nav-hint">scroll · arrow keys · page down</div>
+<div class="nav-hint">scroll · arrow keys · space</div>
 
 <script>
 document.addEventListener('keydown', (e) => {
@@ -451,6 +585,18 @@ document.addEventListener('keydown', (e) => {
     slides[prev].scrollIntoView({ behavior: 'smooth' });
   }
 });
+
+// Slide counter
+const counter = document.createElement('div');
+counter.style.cssText = 'position:fixed;bottom:2vh;left:3vw;font-family:"Red Hat Mono",monospace;font-size:0.7rem;color:#4E5D6C;opacity:0.5;';
+document.body.appendChild(counter);
+const totalSlides = document.querySelectorAll('.slide').length;
+function updateCounter() {
+  const current = Math.round(window.scrollY / window.innerHeight) + 1;
+  counter.textContent = current + ' / ' + totalSlides;
+}
+window.addEventListener('scroll', updateCounter);
+updateCounter();
 </script>
 </body>
 </html>
