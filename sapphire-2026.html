@@ -360,8 +360,8 @@ h2 {
 <!-- SLIDE 4: Human cost (audio slide) -->
 <div class="slide slide-section" id="slide-kermit">
   <p class="act-label">Run — why we do what we do</p>
-  <h2>The people who <span class="red">paid for it.</span></h2>
-  <p class="body-text">One JLR supplier laid off <strong>40 people — half their workforce.</strong> They didn't skip the patch. They didn't leave the password unchanged for four years. They were just downstream.</p>
+  <h2>The people <span class="red">downstream.</span></h2>
+  <p class="body-text">One supplier laid off <strong>40 people — half their workforce.</strong> The breach didn't touch their network. They were just downstream of someone who got hit.</p>
   <div class="stats-row" style="margin-top: 3rem;">
     <div class="stat-block">
       <div class="stat-hero">104,000</div>
@@ -376,7 +376,7 @@ h2 {
       <div class="stat-label">Bank of England cited the breach</div>
     </div>
   </div>
-  <p class="body-text" style="margin-top: 3rem; color: var(--muted); font-style: italic;">This is why the boring stuff matters. Patching. Rotation. Segmentation. The people who get hurt aren't the ones who skipped it.</p>
+  <p class="body-text" style="margin-top: 3rem; color: var(--muted); font-style: italic;">This is why the boring stuff matters. Patching. Rotation. Segmentation. The blast radius reaches further than the breach.</p>
 </div>
 
 <!-- SLIDE 5: Transition -->
@@ -622,15 +622,31 @@ updateCounter();
 
 // Kermit audio on slide 4
 const kermitAudio = new Audio('bein-green-sapphire.mp3');
+kermitAudio.preload = 'auto';
 const kermitSlide = document.getElementById('slide-kermit');
 const nextSlide = document.getElementById('slide-countermeasure');
 let kermitPlayed = false;
+let audioUnlocked = false;
+
+// Prime audio on first user interaction (required by browser autoplay policy)
+function unlockAudio() {
+  if (audioUnlocked) return;
+  audioUnlocked = true;
+  kermitAudio.play().then(() => {
+    kermitAudio.pause();
+    kermitAudio.currentTime = 0;
+  }).catch(() => {});
+}
+document.addEventListener('keydown', unlockAudio, { once: true });
+document.addEventListener('click', unlockAudio, { once: true });
+document.addEventListener('touchstart', unlockAudio, { once: true });
 
 const kermitObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting && !kermitPlayed) {
       kermitPlayed = true;
-      kermitAudio.play();
+      kermitAudio.currentTime = 0;
+      kermitAudio.play().catch(e => console.warn('audio blocked:', e));
       // Fade to black starting at 19s (song fades 20.73-21.03)
       setTimeout(() => {
         kermitSlide.style.transition = 'opacity 2s ease';
