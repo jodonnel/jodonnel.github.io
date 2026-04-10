@@ -152,8 +152,8 @@ h2 {
   font-weight: 700;
   padding: 0.6rem 0;
 }
-.kc-attack strong { color: var(--red); font-weight: 700; }
-.kc-counter strong { color: var(--gold); }
+.kc-attack strong { color: #30BA78; font-weight: 700; }
+.kc-counter strong { color: var(--red); }
 
 .transition-line {
   font-size: clamp(1.5rem, 3vw, 2.5rem);
@@ -379,12 +379,23 @@ h2 {
   <p class="body-text" style="margin-top: 3rem; color: var(--muted); font-style: italic;">This is why the boring stuff matters. Patching. Rotation. Segmentation. The blast radius reaches further than the breach.</p>
 </div>
 
-<!-- SLIDE 5: Transition -->
-<div class="slide slide-transition" id="slide-countermeasure">
-  <p class="transition-line">"Every step in that kill chain had a known countermeasure. Not exotic. Not expensive. <strong style="color: var(--text); font-style: normal;">Just not in place.</strong>"</p>
+<!-- SLIDE 5: What stood in its way (SUSE / audio slide) -->
+<div class="slide slide-section" id="slide-kermit">
+  <audio id="kermit-audio" src="bein-green-sapphire.mp3" preload="auto"></audio>
+  <div id="kermit-fade" style="position:absolute; inset:0; background:#000; opacity:0; pointer-events:none; transition:opacity 2s linear; z-index:10;"></div>
+  <p class="act-label kermit-slow-fade" style="transition:opacity 14s linear;">Run — the mechanism of failure</p>
+  <h2 class="kermit-slow-fade" style="transition:opacity 14s linear;">What stood in its <span class="red">way.</span></h2>
+  <p class="body-text kermit-slow-fade" style="transition:opacity 14s linear;">When the webshell dropped onto the SAP host in August, something had to be standing between it and the rest of the system. That something is the Linux Security Module the OS ships with.</p>
+  <p class="body-text kermit-slow-fade" style="transition:opacity 14s linear;"><strong>Red Hat Enterprise Linux</strong> ships <strong>SELinux</strong>. Mandatory access control, enforcing by default, label-based. Every process on the system runs under policy — including processes that shouldn't be running at all. Red Hat has shipped SAP-aware SELinux guidance for over a decade. <em>"Using SELinux for SAP HANA"</em> is official documentation.</p>
+  <p class="body-text kermit-sles-fade" style="transition:opacity 1s linear;"><strong>SUSE Linux Enterprise</strong> ships <strong>AppArmor</strong>. Opt-in, path-based, profile-driven. It protects what someone has written a profile for. For SAP workloads, the count of shipped profiles is zero.</p>
+  <div style="background: #000; border: 1px solid #00ff41; padding: 1.5rem 2rem; font-family: 'Red Hat Mono', monospace; font-size: 0.95rem; max-width: 600px; margin: 2rem 0; box-shadow: 0 0 20px rgba(0,255,65,0.25);">
+    <div style="color: #00ff41; text-shadow: 0 0 4px rgba(0,255,65,0.6);">sles15:~ # aa-status | grep sap</div>
+    <div style="color: #00ff41; text-shadow: 0 0 4px rgba(0,255,65,0.6);">sles15:~ #</div>
+  </div>
+  <p class="body-text" style="color: var(--muted); font-style: italic;">Nothing was standing in its way.</p>
 </div>
 
-<!-- SLIDE 5: The counter-narrative -->
+<!-- SLIDE 6: The counter-narrative -->
 <div class="slide slide-section">
   <p class="act-label">Run — the counter-narrative</p>
   <h2>What <span class="red">would have</span> been different.</h2>
@@ -414,20 +425,6 @@ h2 {
     <div class="kc-counter"><strong>AIDE + OpenSCAP</strong> detects drift within minutes</div>
   </div>
   <p class="body-text" style="margin-top: 2.5rem;">Six steps. Six countermeasures. The breach still starts — <strong>but it doesn't finish.</strong></p>
-</div>
-
-<!-- SLIDE 6.5: The tools the OS ships (audio slide) -->
-<div class="slide slide-section" id="slide-kermit">
-  <p class="act-label">Run — the tools the OS ships</p>
-  <h2>Not every OS is built for the <span class="red">mission.</span></h2>
-  <p class="body-text">Every Linux distribution makes a choice about what security tools come in the box. That choice determines what's standing between a webshell and the rest of the system before anyone writes custom policy.</p>
-  <p class="body-text"><strong>Red Hat Enterprise Linux</strong> ships <strong>SELinux</strong>. Mandatory access control, enforcing by default, label-based. Every process on the system runs under policy — including processes that shouldn't be running at all. Red Hat has shipped SAP-aware SELinux guidance for over a decade. <em>"Using SELinux for SAP HANA"</em> is official documentation.</p>
-  <p class="body-text"><strong>SUSE Linux Enterprise</strong> ships <strong>AppArmor</strong>. Opt-in, path-based, profile-driven. It protects what someone has written a profile for. For SAP workloads, the count of shipped profiles is zero.</p>
-  <div style="background: #000; border: 1px solid var(--border); padding: 1.5rem 2rem; font-family: 'Red Hat Mono', monospace; font-size: 0.95rem; max-width: 600px; margin: 2rem 0;">
-    <div style="color: var(--muted);">sles15:~ # aa-status | grep sap</div>
-    <div style="color: var(--muted);">sles15:~ #</div>
-  </div>
-  <p class="body-text" style="color: var(--muted); font-style: italic;">Nothing. No profiles. No policy. No mission-specific tool suite for the workload the customer bought the OS to run.</p>
 </div>
 
 <!-- SLIDE 7: Standardize on RHEL -->
@@ -634,36 +631,54 @@ function updateCounter() {
 window.addEventListener('scroll', updateCounter);
 updateCounter();
 
-// Kermit audio on the "tools the OS ships" slide
-const kermitAudio = new Audio('bein-green-sapphire.mp3');
-kermitAudio.preload = 'auto';
+// Kermit audio — embedded <audio> element in the slide, controls visible as fallback
+const kermitAudio = document.getElementById('kermit-audio');
 const kermitSlide = document.getElementById('slide-kermit');
 let kermitPlayed = false;
-let audioUnlocked = false;
 
-// Prime audio on first user interaction (required by browser autoplay policy)
-function unlockAudio() {
-  if (audioUnlocked) return;
-  audioUnlocked = true;
-  kermitAudio.play().then(() => {
-    kermitAudio.pause();
-    kermitAudio.currentTime = 0;
-  }).catch(() => {});
+const kermitFade = document.getElementById('kermit-fade');
+
+function tryPlayKermit() {
+  if (kermitPlayed) return;
+  kermitAudio.currentTime = 0;
+  const p = kermitAudio.play();
+  if (p) p.then(() => {
+    kermitPlayed = true;
+    // 7s: slow fade the intro/RHEL half — 14s transition, lands as music ends (~21s)
+    setTimeout(() => {
+      document.querySelectorAll('#slide-kermit .kermit-slow-fade').forEach(el => el.style.opacity = '0');
+    }, 7000);
+    // 21s: music ends — fade the SLES paragraph (1s), leaving green terminal + closing line
+    setTimeout(() => {
+      document.querySelectorAll('#slide-kermit .kermit-sles-fade').forEach(el => el.style.opacity = '0');
+    }, 21000);
+    // 24s: green terminal has lingered ~2s after music stopped — begin slow 2s fade to black
+    setTimeout(() => { kermitFade.style.opacity = '1'; }, 24000);
+    // 26s: advance to the next slide
+    setTimeout(() => {
+      const slides = document.querySelectorAll('.slide');
+      const idx = Array.from(slides).indexOf(kermitSlide);
+      if (idx >= 0 && idx + 1 < slides.length) slides[idx + 1].scrollIntoView({ behavior: 'instant' });
+    }, 26000);
+  }).catch(e => console.warn('audio blocked — use the player controls:', e));
 }
-document.addEventListener('keydown', unlockAudio, { once: true });
-document.addEventListener('click', unlockAudio, { once: true });
-document.addEventListener('touchstart', unlockAudio, { once: true });
 
 const kermitObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
-    if (entry.isIntersecting && !kermitPlayed) {
-      kermitPlayed = true;
-      kermitAudio.currentTime = 0;
-      kermitAudio.play().catch(e => console.warn('audio blocked:', e));
-    }
+    if (entry.isIntersecting) tryPlayKermit();
   });
-}, { threshold: 0.6 });
+}, { threshold: 0.5 });
 kermitObserver.observe(kermitSlide);
+
+// Also try on any user gesture if the slide is currently centered in view
+['keydown','click','touchstart'].forEach(ev => {
+  document.addEventListener(ev, () => {
+    if (kermitPlayed) return;
+    const rect = kermitSlide.getBoundingClientRect();
+    const mid = window.innerHeight * 0.5;
+    if (rect.top < mid && rect.bottom > mid) tryPlayKermit();
+  });
+});
 </script>
 </body>
 </html>
