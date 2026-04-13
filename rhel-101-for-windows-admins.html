@@ -480,6 +480,7 @@ sudo systemctl status sshd</pre>
   if (savedHost) termHost.value = savedHost;
   let termLoaded = false;
   function loadTerm(host) {
+    if (!/:\d+$/.test(host)) host = host + ':8080';
     termFrame.src = `http://${host}/term/`;
     termLoaded = true;
     termFrame.style.display = '';
