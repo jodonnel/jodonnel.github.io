@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RHEL for Windows Admins — 101</title>
+<style>
+  :root {
+    --bg: #faf7f3;
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --accent: #ee0000;
+    --accent-soft: #fde8e8;
+    --card: #ffffff;
+    --line: #e6e1da;
+    --code-bg: #f4efe8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; scroll-behavior: smooth; }
+  body {
+    font-family: "Overpass", "Red Hat Text", -apple-system, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+  }
+  section {
+    min-height: 100vh;
+    scroll-snap-align: start;
+    padding: 6vh 8vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1px solid var(--line);
+  }
+  h1 { font-size: 3.4rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
+  h2 { font-size: 2.4rem; font-weight: 700; margin-bottom: 1.2rem; letter-spacing: -0.01em; }
+  h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.2rem; margin-bottom: 0.5rem; color: var(--accent); }
+  p, li { font-size: 1.15rem; line-height: 1.55; color: var(--ink); max-width: 62ch; }
+  .lede { font-size: 1.4rem; color: var(--muted); margin-top: 1rem; max-width: 60ch; }
+  .accent { color: var(--accent); }
+  .hat { display: inline-block; padding: 0.3rem 0.8rem; background: var(--accent-soft); color: var(--accent); font-size: 0.85rem; font-weight: 600; border-radius: 4px; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 1.2rem; }
+  table { border-collapse: collapse; width: 100%; max-width: 1000px; margin-top: 1rem; background: var(--card); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+  th, td { text-align: left; padding: 0.75rem 1.1rem; border-bottom: 1px solid var(--line); font-size: 1rem; }
+  th { background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase; }
+  tr:last-child td { border-bottom: none; }
+  code { font-family: "JetBrains Mono", "Fira Code", monospace; background: var(--code-bg); padding: 0.12rem 0.4rem; border-radius: 4px; font-size: 0.95em; color: var(--ink); }
+  pre { background: var(--code-bg); padding: 1.1rem 1.4rem; border-radius: 8px; font-family: "JetBrains Mono", monospace; font-size: 0.98rem; line-height: 1.5; overflow-x: auto; max-width: 900px; margin-top: 1rem; border-left: 4px solid var(--accent); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.2rem; margin-top: 1.2rem; max-width: 1100px; }
+  .card { background: var(--card); padding: 1.4rem 1.6rem; border-radius: 8px; border: 1px solid var(--line); }
+  .footer { position: fixed; bottom: 1.2rem; right: 1.5rem; font-size: 0.8rem; color: var(--muted); background: var(--card); padding: 0.35rem 0.75rem; border-radius: 20px; border: 1px solid var(--line); z-index: 10; }
+  #lab-btn { position: fixed; bottom: 4.2rem; left: 1.5rem; background: #0066cc; color: #fff; border: none; padding: 0.6rem 1.1rem; border-radius: 24px; font-weight: 600; cursor: pointer; font-size: 0.95rem; box-shadow: 0 2px 10px rgba(0,102,204,0.3); z-index: 11; display: none; }
+  #lab-btn:hover { background: #0052a3; }
+  .lab { background: #f0f7ff; border-left: 6px solid #0066cc; }
+  .lab .hat { background: #dbeafe; color: #0066cc; }
+  .lab h3 { color: #0066cc; }
+  .lab ol { padding-left: 1.4rem; margin-top: 0.8rem; }
+  .lab ol li { margin-bottom: 0.9rem; font-size: 1.1rem; }
+  .lab pre { border-left-color: #0066cc; margin: 0.4rem 0; }
+  #term-btn { position: fixed; bottom: 1.2rem; left: 1.5rem; background: var(--accent); color: #fff; border: none; padding: 0.6rem 1.1rem; border-radius: 24px; font-weight: 600; cursor: pointer; font-size: 0.95rem; box-shadow: 0 2px 10px rgba(238,0,0,0.25); z-index: 11; }
+  #term-btn:hover { background: #c00; }
+  #term-panel { position: fixed; top: 0; right: 0; width: 45%; height: 100vh; background: #1a1a1a; border-left: 4px solid var(--accent); transform: translateX(100%); transition: transform 0.25s ease-out; z-index: 12; display: flex; flex-direction: column; }
+  #term-panel.open { transform: translateX(0); }
+  #term-panel header { background: var(--accent); color: #fff; padding: 0.6rem 1rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600; }
+  #term-panel header button { background: none; border: none; color: #fff; cursor: pointer; font-size: 1.2rem; padding: 0 0.4rem; }
+  #term-panel iframe { flex: 1; width: 100%; border: none; background: #1a1a1a; }
+  ul { padding-left: 1.3rem; }
+  li { margin-bottom: 0.35rem; }
+  .agenda-note { margin-top: 1.2rem; padding: 1rem 1.3rem; background: var(--accent-soft); border-left: 4px solid var(--accent); border-radius: 4px; font-size: 1.05rem; max-width: 1000px; }
+  .arrow { color: var(--accent); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<section data-audio="slide-01-title">
+  
+  <h1>RHEL for<br>Windows Admins</h1>
+  <p class="lede">You already know how to run systems. This is a translation guide, not a reboot.</p>
+</section>
+
+<section data-audio="slide-02-agenda">
+  <span class="hat">Section 1 · Agenda</span>
+  <h2>What you asked for — with one small remix.</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>As requested</h3>
+      <ol>
+        <li>File system</li>
+        <li>Paths</li>
+        <li>Basic commands</li>
+        <li>File ops</li>
+        <li>Permissions</li>
+        <li>Users &amp; groups</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>How we'll teach it</h3>
+      <ol>
+        <li>File system <strong>+ paths</strong> <span style="color:var(--muted); font-size:0.9em;">(one block)</span></li>
+        <li>Basic commands</li>
+        <li>File ops</li>
+        <li>Users &amp; groups <span class="arrow">↑</span></li>
+        <li>Permissions <span class="arrow">↑</span></li>
+      </ol>
+    </div>
+  </div>
+  <div class="agenda-note">
+    Permissions sit on top of users and groups. Teaching users and groups first makes the third column of <code>rwxr-xr--</code> actually mean something when we get there.
+  </div>
+</section>
+
+<section data-audio="slide-03-translation">
+  <span class="hat">Section 2 · Translation</span>
+  <h2>Windows → Linux</h2>
+  <p class="lede" style="margin-bottom: 1rem;">Same job. Different shell.</p>
+  <table>
+    <thead><tr><th>Windows</th><th>RHEL</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td>services.msc / sc.exe</td><td><code>systemctl</code></td><td>Start, stop, enable services</td></tr>
+      <tr><td>Event Viewer</td><td><code>journalctl</code></td><td>Read system + service logs</td></tr>
+      <tr><td>Task Manager</td><td><code>top</code> / <code>ps</code></td><td>See what's running</td></tr>
+      <tr><td>Registry</td><td><code>/etc</code> config files</td><td>System &amp; app configuration</td></tr>
+      <tr><td>Run as administrator</td><td><code>sudo</code></td><td>Elevate for one command</td></tr>
+      <tr><td>C:\Users\jim</td><td><code>/home/jim</code></td><td>Your home directory</td></tr>
+      <tr><td>PowerShell</td><td><code>bash</code> + pipes</td><td>Scripting &amp; composition</td></tr>
+      <tr><td>Group Policy (GPO)</td><td>Ansible</td><td>Enforce config at scale</td></tr>
+      <tr><td>WSUS / SCCM</td><td>Satellite + Insights</td><td>Patch, inventory, advise</td></tr>
+      <tr><td>Active Directory</td><td>IdM / SSSD join</td><td>Central identity</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section data-audio="slide-04-filesystem">
+  <span class="hat">Section 3 · File system + paths</span>
+  <h2>One tree. No drive letters.</h2>
+  <p class="lede">Everything hangs off <code>/</code>. Disks, network shares, USB sticks — they all mount into a single tree.</p>
+  <pre>/             root of everything
+/etc          config files (your "registry")
+/home         user home directories
+/var/log      logs
+/opt          optional / vendor apps
+/usr          system programs &amp; libraries
+/tmp          scratch space</pre>
+  <div class="grid" style="margin-top: 1.2rem;">
+    <div class="card">
+      <h3>Absolute vs relative</h3>
+      <p><code>/etc/hosts</code> — absolute, always the same place.<br>
+         <code>./hosts</code> — relative, means "hosts in my current dir."<br>
+         <code>~</code> — your home directory shortcut.</p>
+    </div>
+    <div class="card">
+      <h3>Two things to remember</h3>
+      <p><strong>Case-sensitive.</strong> <code>/etc/Passwd</code> ≠ <code>/etc/passwd</code>.<br><br>
+         <strong>Tab completion is your friend.</strong> Type the first few letters, hit Tab.</p>
+    </div>
+  </div>
+</section>
+
+<section data-audio="slide-05-commands" data-lab="lab-explore">
+  <span class="hat">Section 4 · Basic commands</span>
+  <h2>Seeing what's there.</h2>
+  <pre>pwd                     where am I?
+ls                      list files here
+ls -lah                 long format, all, human-readable
+cd /var/log             change directory
+cd ~                    go home
+cd -                    go back to last dir
+cat file.txt            print the whole file
+less file.log           page through a big file (q to quit)
+head -20 file           first 20 lines
+tail -f file.log        follow a log as it grows
+grep "error" file.log   search for a pattern</pre>
+  <p style="margin-top: 1.2rem;">The pipe <code>|</code> is your superpower: <code>ps aux | grep nginx</code> — list all processes, keep the ones matching "nginx."</p>
+</section>
+
+<section id="lab-explore" class="lab">
+  <span class="hat">Lab 1 · Explore</span>
+  <h2>Try it yourself.</h2>
+  <p class="lede">Open the terminal (bottom-left 💻 button). On the lab bastion you'll be <code>studentN</code>; on your own box you're already you. Either way, walk through these.</p>
+  <ol>
+    <li>Where am I, and who am I?
+      <pre>pwd
+whoami
+id</pre>
+    </li>
+    <li>Look around. What's in your home directory?
+      <pre>ls
+ls -lah
+ls -lah ~/practice</pre>
+    </li>
+    <li>Step into practice and read the starter file.
+      <pre>cd ~/practice
+cat hello.txt
+cat README.txt</pre>
+    </li>
+    <li>See the bigger system. Don't touch — just look.
+      <pre>ls /etc | head -20
+cat /etc/os-release
+tail -5 /var/log/messages   # may say permission denied — good, we'll fix that later</pre>
+    </li>
+    <li>Pipes. Find every line mentioning "student" in the user database.
+      <pre>cat /etc/passwd | grep student</pre>
+    </li>
+  </ol>
+</section>
+
+<section data-audio="slide-06-fileops" data-lab="lab-fileops">
+  <span class="hat">Section 5 · File ops</span>
+  <h2>Changing what's there.</h2>
+  <pre>mkdir projects          make a directory
+mkdir -p a/b/c          make the whole path
+cp file.txt backup.txt  copy
+cp -r dir/ backup/      copy a directory recursively
+mv old.txt new.txt      move or rename (same command)
+rm file.txt             delete (no recycle bin — it's gone)
+rm -rf dir/             delete a directory and everything in it
+ln -s /long/path short  symbolic link (shortcut)
+touch newfile           create empty file / update timestamp</pre>
+  <div class="agenda-note" style="margin-top: 1.2rem;">
+    <strong>No recycle bin.</strong> <code>rm</code> is immediate. <code>rm -rf /</code> is how careers end. Always <code>ls</code> before you <code>rm -rf</code>.
+  </div>
+</section>
+
+<section id="lab-fileops" class="lab">
+  <span class="hat">Lab 2 · Make &amp; break things (safely)</span>
+  <h2>Your sandbox. No one gets hurt.</h2>
+  <ol>
+    <li>Build a little directory tree.
+      <pre>cd ~/practice
+mkdir -p projects/demo/notes
+ls -R projects</pre>
+    </li>
+    <li>Make a file two ways.
+      <pre>touch projects/demo/empty.txt
+echo "my first linux file" > projects/demo/notes/day1.txt
+cat projects/demo/notes/day1.txt</pre>
+    </li>
+    <li>Copy, move, rename. All one idea.
+      <pre>cp projects/demo/notes/day1.txt projects/demo/notes/day1-backup.txt
+mv projects/demo/notes/day1.txt projects/demo/notes/monday.txt
+ls projects/demo/notes</pre>
+    </li>
+    <li>Edit with nano. Ctrl-O saves, Ctrl-X exits.
+      <pre>nano projects/demo/notes/monday.txt</pre>
+    </li>
+    <li>Clean up. Notice: no recycle bin.
+      <pre>rm projects/demo/empty.txt
+rm -r projects/demo/notes
+ls projects/demo</pre>
+    </li>
+  </ol>
+</section>
+
+<section data-audio="slide-07-users-groups">
+  <span class="hat">Section 6 · Users &amp; groups</span>
+  <h2>Who is on this box.</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Users</h3>
+      <pre style="margin-top: 0.5rem; font-size: 0.9rem;">id                 who am I?
+whoami             just my name
+useradd alice      create user
+passwd alice       set password
+userdel alice      delete
+/etc/passwd        the user database</pre>
+    </div>
+    <div class="card">
+      <h3>Groups</h3>
+      <pre style="margin-top: 0.5rem; font-size: 0.9rem;">groups             my groups
+groupadd devs      create group
+usermod -aG devs alice
+                   add alice to devs
+/etc/group         the group database</pre>
+    </div>
+  </div>
+  <p style="margin-top: 1.2rem;">Every user has one <strong>primary group</strong> and zero or more <strong>supplementary groups</strong>. Think AD: user + security groups. Same idea.</p>
+</section>
+
+<section data-audio="slide-08-permissions" data-lab="lab-perms">
+  <span class="hat">Section 7 · Permissions</span>
+  <h2>Who can do what — the synthesis.</h2>
+  <pre>-rwxr-xr--  1  jim  wheel  4096 Apr 14 10:15 script.sh
+ │└┬┘└┬┘└┬┘    │    │
+ │ │  │  │     │    group that owns it
+ │ │  │  │     user that owns it
+ │ │  │  everyone else's permissions
+ │ │  group's permissions
+ │ owner's permissions
+ file type (- = file, d = dir, l = link)</pre>
+  <div class="grid" style="margin-top: 1.2rem; grid-template-columns: 1fr 1fr 1fr;">
+    <div class="card">
+      <h3>Change them</h3>
+      <pre style="margin-top: 0.5rem; font-size: 0.85rem;">chmod 755 script.sh
+chmod +x script.sh
+chown alice:devs file
+chgrp devs file</pre>
+    </div>
+    <div class="card">
+      <h3>sudo, not always-admin</h3>
+      <p style="font-size: 1.05rem;">Per command, not a session. You stay as you. Every elevation logged in <code>/var/log/secure</code>. Root login disabled by default — a feature.</p>
+    </div>
+    <div class="card">
+      <h3>"Command not found"?</h3>
+      <p style="font-size: 1.05rem;">Three things differ between you and root:</p>
+      <ul style="font-size: 1rem; margin-top: 0.5rem;">
+        <li><strong>File perms</strong> — <code>cat /etc/shadow</code> fails for you, works for root.</li>
+        <li><strong>Privileged syscalls</strong> — <code>systemctl start</code>, <code>useradd</code>, <code>dnf install</code>.</li>
+        <li><strong>PATH</strong> — historically <code>/usr/sbin</code> was root-only; on RHEL 10 it's everyone's, so you'll see the real "Permission denied" instead.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="lab-perms" class="lab">
+  <span class="hat">Lab 3 · Permissions &amp; sudo</span>
+  <h2>Read the triplets. Feel the denial.</h2>
+  <ol>
+    <li>Read the permissions on a few real files.
+      <pre>ls -l /etc/passwd
+ls -l /etc/shadow
+ls -l /usr/bin/passwd</pre>
+      <p style="font-size:0.95rem; color:var(--muted); margin-top:0.3rem;">Notice: anyone can read passwd. Only root can read shadow. That's the whole security model in two lines.</p>
+    </li>
+    <li>Try to read a root-only file. Watch it fail cleanly.
+      <pre>cat /etc/shadow</pre>
+    </li>
+    <li>Make a file and change its permissions.
+      <pre>cd ~/practice
+echo "secret" > mine.txt
+ls -l mine.txt
+chmod 600 mine.txt
+ls -l mine.txt
+chmod +x mine.txt
+ls -l mine.txt</pre>
+    </li>
+    <li>Elevate with sudo — just for one command. (If sudo isn't set for you, that's the demo: least privilege by default.)
+      <pre>sudo cat /etc/shadow | head -3
+sudo systemctl status sshd</pre>
+    </li>
+    <li>Check what was logged.
+      <pre>sudo tail -20 /var/log/secure</pre>
+    </li>
+  </ol>
+</section>
+
+<section data-audio="slide-085-wegotyou">
+  <span class="hat">Section 7.5 · We got you</span>
+  <h2>At scale, nobody SSH's into 500 boxes.</h2>
+  <p class="lede">You asked for command line, so that's what we did. But real talk — the management stack is every bit as capable as what you run on the Windows side.</p>
+  <div class="grid" style="grid-template-columns: 1fr 1fr; margin-top: 1.4rem;">
+    <div class="card">
+      <h3>Red Hat Satellite</h3>
+      <p>Patch, provision, configure fleets. The RHEL analogue to SCCM/WSUS for servers — content views, lifecycle environments, the works.</p>
+    </div>
+    <div class="card">
+      <h3>Ansible Automation Platform</h3>
+      <p>One control plane for Linux <em>and</em> Windows <em>and</em> network gear. Think GPO, but it actually works cross-platform.</p>
+    </div>
+    <div class="card">
+      <h3>Red Hat Insights</h3>
+      <p>Proactive advisor. Flags CVEs, misconfigs, and drift before they page you. Included with every RHEL subscription.</p>
+    </div>
+    <div class="card">
+      <h3>Image mode for RHEL</h3>
+      <p>Servers as versioned, signed images. Golden image, git-native. Roll forward, roll back, done.</p>
+    </div>
+  </div>
+  <div class="agenda-note" style="margin-top: 1.4rem;">
+    Plus the humans: your Red Hat account team, 24/7 support (included), <code>access.redhat.com</code> knowledge base, <code>learn.redhat.com</code>. The CLI is the foundation. The platform is how you actually run it.
+  </div>
+</section>
+
+<section data-audio="slide-09-next">
+  <span class="hat">Section 8 · Where to go next</span>
+  <h2>You're not starting from zero.</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Hands-on</h3>
+      <ul>
+        <li><strong>learn.redhat.com</strong> — free browser labs</li>
+        <li><strong>developers.redhat.com</strong> — free RHEL for dev use</li>
+        <li><strong>RHEL in WSL2</strong> — Linux on your Windows box</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Coming next session</h3>
+      <ul>
+        <li><strong>console.redhat.com</strong> — WSUS + SCCM + Defender, for RHEL</li>
+        <li><strong>Ansible</strong> — GPO for Linux (and Windows, and network gear)</li>
+        <li><strong>Image mode</strong> — RHEL that updates like a container</li>
+      </ul>
+    </div>
+  </div>
+  <p class="lede" style="margin-top: 1.8rem;">You're experienced admins. The primitives are familiar. The rest is vocabulary.</p>
+</section>
+
+<button id="lab-btn">🧪 try the lab</button>
+<button id="term-btn">💻 terminal</button>
+<div id="term-panel">
+  <header>
+    <span>your shell</span>
+    <button id="term-close" title="close">×</button>
+  </header>
+  <iframe id="term-frame" src="about:blank"></iframe>
+</div>
+<div class="footer">
+  <button id="audio-toggle" style="background:none;border:none;color:var(--accent);font-weight:600;cursor:pointer;font-size:0.85rem;padding:0 0.5rem;">🔊 audio on</button>
+  · ← → navigate
+</div>
+<audio id="narrator" preload="auto"></audio>
+
+<script>
+  const sections = document.querySelectorAll('section');
+  let idx = 0;
+  function go(n) {
+    idx = Math.max(0, Math.min(sections.length - 1, n));
+    sections[idx].scrollIntoView({ behavior: 'smooth' });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)) { e.preventDefault(); go(idx + 1); }
+    else if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)) { e.preventDefault(); go(idx - 1); }
+    else if (e.key === 'Home') { go(0); }
+    else if (e.key === 'End') { go(sections.length - 1); }
+  });
+  const narrator = document.getElementById('narrator');
+  const toggle = document.getElementById('audio-toggle');
+  let audioOn = true;
+  let currentSlide = -1;
+  toggle.addEventListener('click', () => {
+    audioOn = !audioOn;
+    toggle.textContent = audioOn ? '🔊 audio on' : '🔇 audio off';
+    if (!audioOn) narrator.pause();
+  });
+  function playSlide(i) {
+    if (!audioOn || i === currentSlide) return;
+    currentSlide = i;
+    const name = sections[i].dataset.audio;
+    if (!name) { narrator.pause(); return; }
+    narrator.src = `rhel-101-for-windows-admins-audio/${name}.mp3`;
+    narrator.play().catch(() => {});
+  }
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        idx = Array.from(sections).indexOf(en.target);
+        playSlide(idx);
+        const lab = en.target.dataset.lab;
+        labBtn.style.display = lab ? 'block' : 'none';
+        labBtn.dataset.target = lab || '';
+      }
+    });
+  }, { threshold: 0.6 });
+  sections.forEach(s => obs.observe(s));
+
+  const labBtn = document.getElementById('lab-btn');
+  labBtn.addEventListener('click', () => {
+    const id = labBtn.dataset.target;
+    if (id) document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+  });
+  const termBtn = document.getElementById('term-btn');
+  const termPanel = document.getElementById('term-panel');
+  const termFrame = document.getElementById('term-frame');
+  const termClose = document.getElementById('term-close');
+  let termLoaded = false;
+  function openTerm() {
+    if (!termLoaded) {
+      termFrame.src = `${window.location.protocol}//${window.location.host}/term/`;
+      termLoaded = true;
+    }
+    termPanel.classList.add('open');
+  }
+  function closeTerm() { termPanel.classList.remove('open'); }
+  termBtn.addEventListener('click', () => termPanel.classList.contains('open') ? closeTerm() : openTerm());
+  termClose.addEventListener('click', closeTerm);
+</script>
+
+</body>
+</html>
