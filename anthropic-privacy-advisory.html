@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The (Not So) Rapid Enshittification of Claude</title>
+
+<meta property="og:title" content="The (Not So) Rapid Enshittification of Claude">
+<meta property="og:description" content="A timeline of Anthropic's quiet pivot from privacy-first to train-by-default, and what you should do about it tonight.">
+<meta property="og:url" content="https://jodonnel.github.io/anthropic-privacy-advisory.html">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The (Not So) Rapid Enshittification of Claude">
+<meta name="twitter:description" content="A timeline of Anthropic's quiet pivot from privacy-first to train-by-default.">
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #faf8f4;
+    --bg-pull: #f2efe8;
+    --text: #1a1a1a;
+    --text-secondary: #4a4a4a;
+    --text-caption: #7a7a7a;
+    --accent: #8b0000;
+    --accent-light: #c44d3f;
+    --rule: #d4d0c8;
+    --rule-heavy: #1a1a1a;
+    --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    --font-body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 18px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .masthead {
+    text-align: center;
+    padding: 2rem 2rem 0;
+    border-bottom: 3px double var(--rule);
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  .masthead .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-caption);
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  .masthead h1 {
+    font-family: var(--font-display);
+    font-size: 3.2rem;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+    color: var(--text);
+  }
+
+  .masthead .dek {
+    font-family: var(--font-body);
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--text);
+    max-width: 560px;
+    margin: 0 auto 1.5rem;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  .masthead .byline {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-caption);
+    padding-bottom: 1.5rem;
+    letter-spacing: 0.03em;
+  }
+
+  .masthead .byline a { color: var(--text-caption); }
+
+  article {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 6rem;
+  }
+
+  p { margin: 0 0 1.3rem; }
+
+  article > p:first-of-type::first-letter {
+    font-family: var(--font-display);
+    font-size: 4.2rem;
+    float: left;
+    line-height: 0.8;
+    padding-right: 0.12em;
+    padding-top: 0.08em;
+    font-weight: 900;
+    color: var(--accent);
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 3rem 0 1rem;
+    letter-spacing: -0.01em;
+  }
+
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+  a:hover { border-bottom-color: var(--accent); }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--bg-pull);
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+  }
+
+  pre {
+    background: #1a1a1a;
+    color: #e8e6e0;
+    border-radius: 2px;
+    padding: 1.2rem 1.5rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.82em;
+    line-height: 1.6;
+  }
+
+  .pullquote {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--text);
+    text-align: center;
+    padding: 2.5rem 2rem;
+    margin: 2.5rem -2rem;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    line-height: 1.4;
+  }
+
+  .timeline {
+    margin: 2rem 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .timeline li {
+    position: relative;
+    padding: 1rem 0 1rem 1.8rem;
+    border-left: 1px solid var(--rule);
+    margin-left: 0.5rem;
+  }
+
+  .timeline li::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 1.35rem;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .timeline .date-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-caption);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  .timeline li p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  .aside-box {
+    background: var(--bg-pull);
+    border-left: 3px solid var(--accent);
+    padding: 1.2rem 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .aside-box .aside-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .aside-box p { margin-bottom: 0.5rem; font-size: 0.95rem; }
+  .aside-box p:last-child { margin-bottom: 0; }
+
+  .section-break {
+    text-align: center;
+    margin: 3rem 0;
+    color: var(--rule);
+    font-size: 1.5rem;
+    letter-spacing: 0.5em;
+  }
+
+  .sources {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+  }
+
+  .sources h2 {
+    font-size: 1rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+  }
+
+  .sources ol {
+    padding-left: 1.5rem;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+  }
+
+  .sources ol a { color: var(--text-secondary); border-bottom: 1px solid var(--rule); }
+  .sources ol a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .disclosure {
+    margin-top: 3rem;
+    padding: 1.2rem 1.5rem;
+    border: 1px solid var(--rule);
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-caption);
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    border-top: 3px double var(--rule);
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  footer a { color: var(--text-caption); }
+
+  @media (max-width: 600px) {
+    .masthead h1 { font-size: 2.2rem; }
+    .pullquote { font-size: 1.4rem; margin: 2rem 0; padding: 2rem 1rem; }
+    article { padding: 2rem 1.5rem 4rem; }
+    article > p:first-of-type::first-letter { font-size: 3.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <span class="section-label">Technology &amp; Privacy</span>
+  <h1>The (Not So) Rapid Enshittification of Claude</h1>
+  <p class="dek">How Anthropic quietly pivoted from privacy-first to train-by-default &mdash; and what you should do about it.</p>
+  <div class="byline">By <a href="https://x.com/JimDemosLinux">Jim O'Donnell</a> &nbsp;&bull;&nbsp; April 21, 2026</div>
+</div>
+
+<article>
+
+<div style="margin: 0 auto 2.5rem; max-width: 480px;">
+  <img src="window-trust.jpg" alt="Ada Lovelace at her desk, hand-tinted daguerreotype style" style="width: 100%; display: block; border-radius: 2px;">
+  <div style="text-align: right; font-size: 0.65rem; color: var(--text-caption); margin-top: 0.3rem; font-family: var(--font-mono);">AI Generated Image</div>
+</div>
+
+<p>I use Claude Code as a key asset in my daily work. It is approved AI tooling at my employer. I recommend these tools to customers and colleagues. It is incumbent upon me to provide useful advice on the safe use of the tools I have recommended, and I take that responsibility seriously.</p>
+
+<p>Earlier this month, Anthropic cut off Claude Code subscribers from using <a href="https://en.wikipedia.org/wiki/OpenClaw">OpenClaw</a> and temporarily banned its creator from the platform. That story has been <a href="https://www.youtube.com/shorts/GE1c4Tb3Zsw">widely</a> <a href="https://news.ycombinator.com/item?id=47633396">covered</a>. What hasn't been covered is the thing that should concern you more: a privacy policy change from August 2025 that most users never noticed.</p>
+
+<p>Your conversations with Claude &mdash; every API key, every customer name, every credential you pasted in for debugging &mdash; are being used to train future models. By default. Retained for up to five years. Unless you found a toggle buried in settings and turned it off.</p>
+
+<p class="pullquote">Five years of retention is five years of attack surface.</p>
+
+<h2>The Timeline</h2>
+
+<p>What follows is a sequence of events spanning eight months. Each is individually defensible. Together, they trace the <a href="https://en.wikipedia.org/wiki/Enshittification">enshittification curve</a> described by Cory Doctorow with uncomfortable precision: attract users with value, extract data from users, then lock out competitors.</p>
+
+<ul class="timeline">
+  <li>
+    <span class="date-label">Before August 2025</span>
+    <p>Anthropic's documentation states that user data is not used for model training and is generally deleted within 30 days. This is a selling point. Users choose Claude over competitors partly on this basis.</p>
+  </li>
+  <li>
+    <span class="date-label">August 28, 2025</span>
+    <p>Anthropic <a href="https://techcrunch.com/2025/08/28/anthropic-users-face-a-new-choice-opt-out-or-share-your-data-for-ai-training/">updates its consumer terms</a>. Conversations now train future models by default. Existing users receive a pop-up with a prominent black &ldquo;Accept&rdquo; button and a much smaller toggle &mdash; preset to On &mdash; in smaller print below it. Retention jumps from 30 days to <a href="https://www.anthropic.com/news/updates-to-our-consumer-terms">five years</a>. Enterprise API customers are exempt &mdash; they get <a href="https://privacy.claude.com/en/articles/8956058-i-have-a-zero-data-retention-agreement-with-anthropic-what-products-does-it-apply-to">Zero Data Retention</a>. Same company, different rules.</p>
+  </li>
+  <li>
+    <span class="date-label">March 31, 2026</span>
+    <p>An Anthropic engineer <a href="https://www.theregister.com/2026/03/31/anthropic_claude_code_source_code/">forgets to add <code>*.map</code> to <code>.npmignore</code></a>. The Claude Code npm package ships with 512,000 lines of unobfuscated TypeScript. The leaked source reveals a <a href="https://alex000kim.com/posts/2026-03-31-claude-code-source-leak/">frustration-detection regex</a> that tracks when users type words like &ldquo;wtf&rdquo; and &ldquo;shit,&rdquo; and an <a href="https://read.engineerscodex.com/p/diving-into-claude-codes-source-code">&ldquo;Undercover Mode&rdquo;</a> that strips attribution when Anthropic employees contribute to public repositories. The system prompt reads: <em>&ldquo;You are operating UNDERCOVER&hellip; Do not blow your cover.&rdquo;</em></p>
+    <p>Anthropic responds by <a href="https://techcrunch.com/2026/04/01/anthropic-took-down-thousands-of-github-repos-trying-to-yank-its-leaked-source-code-a-move-the-company-says-was-an-accident/">filing DMCA takedowns against <a href="https://layer5.io/blog/engineering/the-claude-code-source-leak-512000-lines-a-missing-npmignore-and-the-fastest-growing-repo-in-github-history">reportedly thousands of GitHub repositories</a></a>, then retracts most of them, calling the bulk takedown &ldquo;an accident.&rdquo;</p>
+  </li>
+  <li>
+    <span class="date-label">March&ndash;April 2026</span>
+    <p>Anthropic launches <a href="https://venturebeat.com/orchestration/anthropic-just-shipped-an-openclaw-killer-called-claude-code-channels">Claude Code Channels</a> &mdash; Telegram, Discord, and iMessage integration &mdash; widely characterized as an OpenClaw competitor. Then, on April 4, <a href="https://techcrunch.com/2026/04/04/anthropic-says-claude-code-subscribers-will-need-to-pay-extra-for-openclaw-support/">cuts off Claude Code subscribers from using OpenClaw</a>. Anthropic's head of Claude Code <a href="https://venturebeat.com/technology/anthropic-cuts-off-the-ability-to-use-claude-subscriptions-with-openclaw-and">cited infrastructure strain</a>, saying &ldquo;subscriptions weren't built for the usage patterns of these third-party tools.&rdquo; Ship the replacement, then pull the rug.</p>
+  </li>
+  <li>
+    <span class="date-label">April 10, 2026</span>
+    <p>Anthropic <a href="https://techcrunch.com/2026/04/10/anthropic-temporarily-banned-openclaws-creator-from-accessing-claude/">temporarily bans OpenClaw's creator</a> from accessing Claude, citing &ldquo;suspicious activity.&rdquo; The account is reinstated hours later, after the post goes viral. The creator &mdash; <a href="https://techcrunch.com/2026/02/15/openclaw-creator-peter-steinberger-joins-openai/">who had joined OpenAI in February</a> &mdash; responds: &ldquo;First they copy popular features into their closed harness, then they lock out open source.&rdquo;</p>
+  </li>
+  <li>
+    <span class="date-label">April 16, 2026</span>
+    <p>Anthropic quietly introduces <a href="https://decrypt.co/364509/claude-anthropic-government-id-kyc-privacy">government ID and live selfie verification</a> for &ldquo;select use cases.&rdquo; No press release. Users discover it when screenshots surface. Decrypt's headline: <a href="https://decrypt.co/364509/claude-anthropic-government-id-kyc-privacy">&ldquo;You Switched to Claude Over Surveillance Fears. Now It Wants Your Passport.&rdquo;</a></p>
+  </li>
+</ul>
+
+<h2>The Secrets Problem</h2>
+
+<p>This is not an abstract privacy concern. It is an operational security failure hiding in plain sight.</p>
+
+<p>Developers paste things into AI coding assistants. That is the entire point of the tool. API keys. Database connection strings. Private keys. <code>.env</code> files. Access tokens. Internal hostnames. Customer names. Architecture diagrams described in prose. The assistant needs context to be useful, and the context is sensitive by nature.</p>
+
+<p>Claude Code also supports MCP &mdash; Model Context Protocol &mdash; which connects the assistant to external services like Gmail, calendars, databases, and file systems. MCP tool results are part of the conversation context: email contents, calendar entries, query results, file contents. Anyone who debugged their MCP setup in a Claude conversation likely pasted credentials directly into the chat. Under the current policy, that conversation data may be retained and used for training unless the user independently found and disabled the opt-out.</p>
+
+<div class="aside-box">
+  <div class="aside-title">What's at risk</div>
+  <p>Anthropic says they strip PII and secrets before training. That requires trusting a pipeline you cannot audit, operated by a company that just demonstrated it cannot keep its own source code off npm. The data does not need to be stolen to be dangerous. It needs to exist. Five years of retention is five years of attack surface.</p>
+</div>
+
+<h2>How to Disable It</h2>
+
+<div class="aside-box">
+  <div class="aside-title">On claude.ai</div>
+  <p>Profile icon &rarr; Settings &rarr; Privacy &rarr; Toggle off <strong>&ldquo;Help improve Claude.&rdquo;</strong></p>
+</div>
+
+<div class="aside-box">
+  <div class="aside-title">In Claude Code (the CLI)</div>
+  <p>Add <code>"privacy": {"enabled": false}</code> to your settings file:</p>
+</div>
+
+<pre>python3 -c "
+import json, os
+f = os.path.expanduser('~/.claude/settings.json')
+d = json.load(open(f))
+d['privacy'] = {'enabled': False}
+json.dump(d, open(f,'w'), indent=2)
+print('Done — training on your conversations is disabled.')
+"</pre>
+
+<div class="aside-box">
+  <div class="aside-title">Then rotate your secrets</div>
+  <p>Any API key, token, or credential you have ever pasted into a Claude conversation should be considered potentially exposed. Rotate them. Not because Anthropic is malicious &mdash; because the data exists, the retention window is five years, and breaches happen to everyone.</p>
+</div>
+
+<div class="section-break">&bull; &bull; &bull;</div>
+
+<h2>The Bigger Picture</h2>
+
+<p><a href="https://www.aimagicx.com/blog/ai-data-sovereignty-cloud-strategy-legal-risks-2026">Dozens of countries</a> have enacted or strengthened data localization requirements for AI processing in the last two years. Nation-states understand that whoever controls the model controls the intelligence. France, India, the UAE, and the European Union are building sovereign AI infrastructure &mdash; not because they distrust any particular company, but because the structural incentives make this outcome inevitable.</p>
+
+<p>Individuals have not caught up. We are still pasting our most sensitive professional data into tools whose privacy policies change with a blog post and a dark-pattern toggle.</p>
+
+<p>The alternative exists. Open-source models run on consumer hardware. <a href="https://ollama.com">Ollama</a> makes local inference trivial. The models are getting smaller and faster every quarter. A Raspberry Pi and a network connection is enough to run a personal AI that never phones home.</p>
+
+<p>The right to control your own intelligence should not require a subscription to someone else's terms of service.</p>
+
+<div class="sources">
+  <h2>Sources</h2>
+  <ol>
+    <li><a href="https://techcrunch.com/2025/08/28/anthropic-users-face-a-new-choice-opt-out-or-share-your-data-for-ai-training/">Anthropic users face a new choice &mdash; opt out or share your chats for AI training</a>. TechCrunch, August 28, 2025.</li>
+    <li><a href="https://www.anthropic.com/news/updates-to-our-consumer-terms">Updates to Consumer Terms and Privacy Policy</a>. Anthropic, August 2025.</li>
+    <li><a href="https://privacy.claude.com/en/articles/8956058-i-have-a-zero-data-retention-agreement-with-anthropic-what-products-does-it-apply-to">Zero Data Retention agreement scope</a>. Anthropic Privacy Center.</li>
+    <li><a href="https://www.theregister.com/2026/03/31/anthropic_claude_code_source_code/">Anthropic accidentally exposes Claude Code source code</a>. The Register, March 31, 2026.</li>
+    <li><a href="https://alex000kim.com/posts/2026-03-31-claude-code-source-leak/">The Claude Code Source Leak</a>. Alex Kim, March 31, 2026.</li>
+    <li><a href="https://read.engineerscodex.com/p/diving-into-claude-codes-source-code">Diving into Claude Code's source code</a>. Engineer's Codex, April 2026.</li>
+    <li><a href="https://developers.slashdot.org/story/26/04/05/2339243/claude-code-leak-reveals-a-stealth-mode-for-genai-code-contributions---and-a-frustration-words-regex">Claude Code leak reveals Stealth Mode and Frustration Words Regex</a>. Slashdot, April 5, 2026.</li>
+    <li><a href="https://www.scientificamerican.com/article/anthropic-leak-reveals-claude-code-tracking-user-frustration-and-raises-new/">Anthropic leak reveals Claude Code tracking user frustration</a>. Scientific American, April 2026.</li>
+    <li><a href="https://venturebeat.com/orchestration/anthropic-just-shipped-an-openclaw-killer-called-claude-code-channels">Anthropic ships OpenClaw killer called Claude Code Channels</a>. VentureBeat, April 2026.</li>
+    <li><a href="https://techcrunch.com/2026/04/04/anthropic-says-claude-code-subscribers-will-need-to-pay-extra-for-openclaw-support/">Claude Code subscribers will need to pay extra for OpenClaw usage</a>. TechCrunch, April 4, 2026.</li>
+    <li><a href="https://techcrunch.com/2026/04/10/anthropic-temporarily-banned-openclaws-creator-from-accessing-claude/">Anthropic temporarily banned OpenClaw's creator from accessing Claude</a>. TechCrunch, April 10, 2026.</li>
+    <li><a href="https://techcrunch.com/2026/02/15/openclaw-creator-peter-steinberger-joins-openai/">OpenClaw creator Peter Steinberger joins OpenAI</a>. TechCrunch, February 15, 2026.</li>
+    <li><a href="https://decrypt.co/364509/claude-anthropic-government-id-kyc-privacy">You Switched to Claude Over Surveillance Fears. Now It Wants Your Passport</a>. Decrypt, April 16, 2026.</li>
+    <li><a href="https://winbuzzer.com/2026/04/16/anthropic-claude-id-verification-backlash-xcxwbn/">Claude Now Requires ID Checks, Locking Out Some Users</a>. WinBuzzer, April 16, 2026.</li>
+    <li><a href="https://privacy.claude.com/en/articles/10023580-is-my-data-used-for-model-training">Is my data used for model training?</a> Anthropic Privacy Center.</li>
+  </ol>
+</div>
+
+<div class="disclosure">
+  <strong>Disclosure:</strong> This article was written with Claude Code, running Anthropic's Claude Opus 4.6. The tool that helped research and draft this piece is the tool being written about. The irony is noted.
+</div>
+
+</article>
+
+<footer>
+  Jim O'Donnell &nbsp;&bull;&nbsp; <a href="https://github.com/jodonnel">GitHub</a> &nbsp;&bull;&nbsp; <a href="https://x.com/JimDemosLinux">@JimDemosLinux</a>
+</footer>
+
+</body>
+</html>
