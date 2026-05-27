@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OHC Presentation — The JLR Cyberattack</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Mono:wght@400;700&family=Red+Hat+Text:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06090F; --surface: #0D1117; --border: #1C2333; --muted: #4E5D6C; --text: #F0F4F8;
+  --green: #00D26A; --blue: #0070F2; --red: #EE0000;
+  --red-glow: rgba(238,0,0,0.10);
+  --amber: #F59E0B; --teal: #14B8A6;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:'Red Hat Display',sans-serif; }
+
+.deck { position:relative; width:100vw; height:100vh; }
+.slide {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; padding:5vh 6vw 8vh;
+  opacity:0; pointer-events:none; transition:opacity 0.5s ease;
+}
+.slide.active { opacity:1; pointer-events:auto; }
+
+/* Progress */
+.progress { position:fixed; top:0; left:0; height:0.3vh; z-index:200; background:var(--red); transition:width 0.3s; }
+.slide-num { position:fixed; bottom:2vh; left:50%; transform:translateX(-50%); z-index:100; font-family:'Red Hat Mono',monospace; font-size:0.9vw; color:var(--muted); display:flex; align-items:center; gap:1.2vw; }
+.nav-btn { background:none; border:1px solid var(--border); border-radius:0.3vw; color:var(--muted); font-family:'Red Hat Mono',monospace; font-size:1vw; padding:0.4vh 1vw; cursor:pointer; transition:border-color 0.15s,color 0.15s; }
+.nav-btn:hover { border-color:var(--text); color:var(--text); }
+.nav-btn:disabled { opacity:0.2; cursor:default; }
+
+/* Back link */
+.back-link {
+  position:fixed; top:1.5vh; left:1.5vw; z-index:100;
+  color:var(--muted); font-family:'Red Hat Mono',monospace; font-size:0.9vw;
+  text-decoration:none; border:1px solid var(--border); border-radius:0.4vw;
+  padding:0.4vh 0.8vw; background:var(--surface); transition:color 0.2s, border-color 0.2s;
+}
+.back-link:hover { color:var(--text); border-color:var(--muted); }
+
+/* Typography */
+.mega { font-size:clamp(3rem,8vw,6rem); font-weight:900; line-height:1.05; }
+.big { font-size:clamp(2rem,5vw,3.5rem); font-weight:700; line-height:1.15; }
+.medium { font-size:clamp(1.2rem,3vw,1.8rem); font-weight:300; line-height:1.4; font-family:'Red Hat Text',sans-serif; }
+.small { font-size:1.1vw; color:var(--muted); font-family:'Red Hat Text',sans-serif; }
+.mono { font-family:'Red Hat Mono',monospace; }
+.red { color:var(--red); } .amber { color:var(--amber); } .blue { color:var(--blue); } .muted { color:var(--muted); } .green { color:var(--green); } .center { text-align:center; }
+
+.brand { display:flex; align-items:center; gap:1.5vw; margin-bottom:3vh; }
+.brand .rh { color:var(--red); font-size:1.1vw; font-weight:700; letter-spacing:0.15vw; }
+.brand .sep { color:var(--muted); font-size:1.5vw; }
+.brand .sap { color:var(--blue); font-size:1.1vw; font-weight:700; letter-spacing:0.15vw; }
+
+.spacer { height:2.5vh; } .spacer-lg { height:5vh; }
+
+/* Points */
+.points { list-style:none; margin-top:2.5vh; }
+.points li { font-size:1.4vw; font-weight:300; padding:1vh 0; border-bottom:1px solid var(--border); display:flex; align-items:baseline; gap:1vw; font-family:'Red Hat Text',sans-serif; }
+.points li .icon { font-size:1.7vw; flex-shrink:0; }
+
+/* Alert line */
+.alert-line {
+  margin-top:3vh; padding:1.5vh 2vw;
+  border-left:0.3vw solid var(--red); background:rgba(238,0,0,0.06);
+  border-radius:0 0.6vw 0.6vw 0;
+  font-size:1.4vw; font-weight:700; color:var(--red);
+  font-family:'Red Hat Text',sans-serif;
+}
+.alert-line.amber-alert {
+  border-left-color:var(--amber); background:rgba(245,158,11,0.06); color:var(--amber);
+}
+
+/* Stat row */
+.stat-row { display:flex; gap:1.8vw; margin-top:3vh; flex-wrap:wrap; justify-content:center; }
+.stat-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:0.9vw;
+  padding:2.5vh 2.2vw; min-width:14vw; flex:1; max-width:20vw; text-align:center;
+}
+.stat-card .stat-num { font-size:2.8vw; font-weight:900; font-family:'Red Hat Display',sans-serif; line-height:1.1; }
+.stat-card .stat-label { font-size:1vw; color:var(--muted); margin-top:0.8vh; font-family:'Red Hat Text',sans-serif; }
+.stat-card .stat-accent { width:100%; height:0.25vh; border-radius:0.15vw; margin-bottom:1.5vh; }
+
+/* Timeline — horizontal */
+.timeline { width:70vw; margin-top:3vh; display:flex; align-items:flex-start; position:relative; }
+.timeline::before { content:''; position:absolute; top:1.8vw; left:0; right:0; height:0.15vw; background:var(--border); }
+.tl-item { flex:1; display:flex; flex-direction:column; align-items:center; position:relative; padding:0 0.6vw; }
+.tl-dot { width:0.9vw; height:0.9vw; border-radius:50%; flex-shrink:0; z-index:1; margin-bottom:1vh; }
+.tl-date { font-family:'Red Hat Mono',monospace; font-size:0.9vw; font-weight:700; margin-bottom:0.5vh; text-align:center; }
+.tl-text { font-size:1vw; font-family:'Red Hat Text',sans-serif; font-weight:300; text-align:center; line-height:1.4; }
+
+/* Stack grid */
+.stack-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2vw; width:65vw; margin-top:2.5vh; }
+.stack-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:0.9vw;
+  padding:2vh 2vw;
+}
+.stack-card .sc-title { font-size:1.3vw; font-weight:700; margin-bottom:0.8vh; font-family:'Red Hat Display',sans-serif; }
+.stack-card .sc-items { list-style:none; }
+.stack-card .sc-items li { font-size:1.1vw; font-weight:300; color:var(--muted); padding:0.3vh 0; font-family:'Red Hat Text',sans-serif; }
+.stack-card .sc-items li strong { color:var(--text); font-weight:700; }
+
+/* Quote block */
+.quote-block {
+  width:65vw; margin-top:1.5vh;
+  background:var(--surface); border:1px solid var(--border); border-radius:1.2vw;
+  padding:3vh 3vw; position:relative;
+}
+.quote-mark { font-family:Georgia,serif; font-size:5vw; color:var(--red); line-height:1; position:absolute; top:1vh; left:1.8vw; }
+.quote-text { font-family:Georgia,serif; font-size:1.3vw; font-weight:400; color:var(--text); line-height:1.5; padding-left:3vw; }
+
+/* Ask grid */
+.ask-grid { display:grid; grid-template-columns:auto 1fr; gap:1vh 1.5vw; width:65vw; margin-top:2.5vh; align-items:start; }
+.ask-num {
+  width:2.8vw; height:2.8vw; border-radius:50%; background:var(--surface); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Red Hat Mono',monospace; font-size:1.1vw; font-weight:700; color:var(--red);
+}
+.ask-text { font-family:'Red Hat Text',sans-serif; font-size:1.3vw; font-weight:300; color:var(--text); padding-top:0.5vh; }
+
+/* Source cols */
+.source-cols { display:grid; grid-template-columns:1fr 1fr; gap:2vh 3.5vw; width:65vw; margin-top:1.5vh; }
+.source-section .src-head { font-size:1vw; font-weight:700; color:var(--text); margin-bottom:0.8vh; font-family:'Red Hat Display',sans-serif; letter-spacing:0.08vw; }
+.source-section .src-item { font-size:0.9vw; color:var(--muted); padding:0.25vh 0; font-family:'Red Hat Text',sans-serif; }
+
+/* Subtle ambient glow */
+.glow-bg::before {
+  content:''; position:absolute; top:40%; left:50%; width:55vw; height:55vw;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle,var(--red-glow) 0%,transparent 70%);
+  pointer-events:none; z-index:-1;
+}
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+.fade-up { animation:fadeUp 0.6s ease-out both; }
+.delay-1 { animation-delay:0.15s; } .delay-2 { animation-delay:0.3s; }
+.delay-3 { animation-delay:0.45s; } .delay-4 { animation-delay:0.6s; }
+
+/* Breach timeline (slide 2) */
+.breach-tl { width:70vw; position:relative; }
+.breach-tl .bars-row { display:flex; gap:0.3vw; margin-bottom:0.6vh; }
+.breach-tl .bar { height:2.5vh; border-radius:0.3vw; display:flex; align-items:center; justify-content:center; font-family:'Red Hat Display',sans-serif; font-weight:500; font-size:0.85vw; letter-spacing:0.02em; }
+.breach-tl .bar-spacer { flex:0 0 22.5%; }
+.breach-tl .bar-cve { flex:0 0 40%; background:rgba(238,153,0,0.15); border:1px solid rgba(238,153,0,0.3); color:#ee9900; }
+.breach-tl .bar-shutdown { flex:0 0 18%; background:rgba(238,0,0,0.12); border:1px solid rgba(238,0,0,0.3); color:var(--red); }
+.breach-tl .tl-line { height:0.2vw; background:#4a4a4a; position:relative; }
+.breach-tl .tl-line .year-label { font-family:'Red Hat Display',sans-serif; font-weight:700; font-size:1vw; color:var(--muted); position:absolute; left:0; top:1vh; }
+.breach-tl .tl-line .tick { position:absolute; top:-0.2vw; width:1px; height:0.6vw; background:#666; }
+.breach-tl .month-labels { display:flex; position:relative; height:2vh; margin-top:0.8vh; }
+.breach-tl .month-label { position:absolute; transform:translateX(-50%); font-size:0.85vw; color:#888; font-weight:500; }
+.breach-tl .events-row { display:flex; position:relative; height:9vh; }
+.breach-tl .events-row.above { margin-bottom:0.4vh; }
+.breach-tl .events-row.below { margin-top:0.4vh; }
+.breach-tl .ev-card { position:absolute; transform:translateX(-50%); width:8.5vw; border-radius:0.4vw; padding:0.6vh 0.6vw 0.5vh; text-align:center; }
+.breach-tl .ev-card.wide { width:10vw; }
+.breach-tl .ev-card .ev-title { font-family:'Red Hat Display',sans-serif; font-weight:700; font-size:0.85vw; line-height:1.3; margin-bottom:0.2vh; }
+.breach-tl .ev-card .ev-detail { font-size:0.7vw; line-height:1.35; opacity:0.8; }
+.breach-tl .ev-card.ev-red { background:rgba(238,0,0,0.1); border:1px solid rgba(238,0,0,0.25); }
+.breach-tl .ev-card.ev-red .ev-title { color:#ff6b6b; } .breach-tl .ev-card.ev-red .ev-detail { color:#cc8888; }
+.breach-tl .ev-card.ev-green { background:rgba(63,167,99,0.1); border:1px solid rgba(63,167,99,0.25); }
+.breach-tl .ev-card.ev-green .ev-title { color:#5fc87a; } .breach-tl .ev-card.ev-green .ev-detail { color:#88b898; }
+.breach-tl .ev-card.ev-coral { background:rgba(216,90,48,0.1); border:1px solid rgba(216,90,48,0.25); }
+.breach-tl .ev-card.ev-coral .ev-title { color:#e8845a; } .breach-tl .ev-card.ev-coral .ev-detail { color:#c49878; }
+.breach-tl .ev-card.ev-amber { background:rgba(238,153,0,0.1); border:1px solid rgba(238,153,0,0.25); }
+.breach-tl .ev-card.ev-amber .ev-title { color:#eea520; } .breach-tl .ev-card.ev-amber .ev-detail { color:#c4a868; }
+.breach-tl .ev-card.ev-red-strong { background:rgba(238,0,0,0.15); border:2px solid rgba(238,0,0,0.4); }
+.breach-tl .ev-card.ev-red-strong .ev-title { color:#ff4444; font-size:0.95vw; } .breach-tl .ev-card.ev-red-strong .ev-detail { color:#cc8888; }
+.breach-tl .stem { position:absolute; width:1px; transform:translateX(-50%); }
+.breach-tl .stem-above { bottom:0; height:1.8vh; }
+.breach-tl .stem-below { top:0; height:1.8vh; }
+.breach-compare { display:flex; gap:1.2vw; margin-top:3vh; width:70vw; }
+.breach-compare .cmp-box { flex:1; border-radius:0.6vw; padding:1.5vh 1.5vw; }
+.breach-compare .cmp-box h3 { font-family:'Red Hat Display',sans-serif; font-weight:700; font-size:1.1vw; margin-bottom:0.4vh; }
+.breach-compare .cmp-box p { font-size:1vw; opacity:0.8; font-family:'Red Hat Text',sans-serif; }
+.breach-compare .cmp-bad { background:rgba(238,0,0,0.08); border:1px solid rgba(238,0,0,0.2); }
+.breach-compare .cmp-bad h3 { color:#ff6b6b; } .breach-compare .cmp-bad p { color:#cc9999; }
+.breach-compare .cmp-good { background:rgba(63,167,99,0.08); border:1px solid rgba(63,167,99,0.2); }
+.breach-compare .cmp-good h3 { color:#5fc87a; } .breach-compare .cmp-good p { color:#88b898; }
+
+/* vw/vh handles responsive sizing natively — no media query needed */
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="slide-num">
+  <button class="nav-btn" id="prevBtn" onclick="prev()">&larr;</button>
+  <span id="slideNum"></span>
+  <button class="nav-btn" id="nextBtn" onclick="next()">&rarr;</button>
+  <a href="present-index.html" class="nav-btn" style="text-decoration:none;">&#x2302;</a>
+</div>
+<a href="present-index.html" class="back-link">&larr; index</a>
+
+<div class="deck" id="deck">
+
+  <!-- 1: Hook -->
+  <div class="slide active glow-bg" data-slide="1">
+    <div class="brand fade-up">
+      <span class="rh">RED HAT</span><span class="sep">&times;</span><span class="sap">SAP</span>
+    </div>
+    <div class="mega center fade-up delay-1">The JLR Cyberattack</div>
+    <div class="spacer"></div>
+    <div class="medium center muted fade-up delay-2">Lessons from a five-week shutdown.</div>
+    <div class="spacer-lg"></div>
+    <div class="small mono center fade-up delay-3">Jim O'Donnell &middot; Red Hat &middot; SAP Insider 2026</div>
+  </div>
+
+  <!-- 2: The Vulnerability -->
+  <div class="slide glow-bg" data-slide="2">
+    <div class="big center fade-up" style="margin-bottom:0.3vh;">CVE-2025-31324</div>
+    <div class="medium center amber fade-up delay-1">CVSS 10.0 &mdash; Maximum Severity</div>
+    <div class="spacer-lg"></div>
+    <div class="alert-line fade-up delay-2" style="margin-bottom:2.5vh;">SAP HANA runs on exactly two certified operating systems. One of them would have caught this.</div>
+    <div class="timeline fade-up delay-3">
+      <div class="tl-item">
+        <div class="tl-date green">APR 2025</div>
+        <div class="tl-dot" style="background:var(--green);"></div>
+        <div class="tl-text">SAP releases emergency patch</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date green">MAY 2025</div>
+        <div class="tl-dot" style="background:var(--green);"></div>
+        <div class="tl-text">CISA adds to KEV catalog</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date amber">APR&ndash;AUG</div>
+        <div class="tl-dot" style="background:var(--amber);"></div>
+        <div class="tl-text">1,200+ systems exposed globally</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date red">AUG 31</div>
+        <div class="tl-dot" style="background:var(--red);"></div>
+        <div class="tl-text"><strong>JLR breached</strong><br>Still unpatched</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date red">SEP 1</div>
+        <div class="tl-dot" style="background:var(--red);"></div>
+        <div class="tl-text">All global plants shut down</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date muted">OCT 8</div>
+        <div class="tl-dot" style="background:var(--muted);"></div>
+        <div class="tl-text">Phased restart<br>5 weeks later</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3: The Damage -->
+  <div class="slide" data-slide="3">
+    <div class="big center fade-up">$2.5 billion for a missing patch.</div>
+    <div class="stat-row fade-up delay-1">
+      <div class="stat-card">
+        <div class="stat-accent" style="background:var(--red);"></div>
+        <div class="stat-num red">5 weeks</div>
+        <div class="stat-label">Total shutdown<br>All global plants</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-accent" style="background:var(--amber);"></div>
+        <div class="stat-num amber">&ndash;27%</div>
+        <div class="stat-label">UK car output YoY<br>Worst September since 1952</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-accent" style="background:var(--blue);"></div>
+        <div class="stat-num blue">120K</div>
+        <div class="stat-label">Supplier jobs at risk<br>&pound;1.5B govt loan guarantee</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-accent" style="background:var(--muted);"></div>
+        <div class="stat-num" style="color:var(--text);">&pound;800M</div>
+        <div class="stat-label">TCS cybersecurity contract<br>Didn't prevent the breach</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="alert-line fade-up delay-2">Scattered Lapsus$ Hunters &mdash; via unpatched SAP NetWeaver</div>
+  </div>
+
+  <!-- 4: What Changes on Red Hat -->
+  <div class="slide glow-bg" data-slide="4">
+    <div class="big center fade-up">What changes on Red Hat.</div>
+    <div class="spacer"></div>
+    <div class="stack-grid fade-up delay-1">
+      <div class="stack-card" style="border-top:3px solid var(--red);">
+        <div class="sc-title red">Red Hat Lightspeed for SAP</div>
+        <ul class="sc-items">
+          <li><strong>1,000+ rules</strong> including SAP-specific config checks</li>
+          <li><strong>SAP-tailored dashboard</strong> &mdash; auto-discovery for HANA + NetWeaver</li>
+          <li><strong>Filter by SID natively</strong> &mdash; no custom configuration</li>
+          <li><strong>CVE lifecycle tracking</strong> across your entire SAP landscape</li>
+          <li><strong>Drift detection</strong> before config changes become attack vectors</li>
+        </ul>
+      </div>
+      <div class="stack-card" style="border-top:3px solid var(--amber);">
+        <div class="sc-title amber">Satellite + E4S Patching</div>
+        <ul class="sc-items">
+          <li><strong>E4S:</strong> 4 years of critical CVE patches per RHEL minor release</li>
+          <li><strong>Kernel live patching</strong> &mdash; SAP stays up, patch gets applied</li>
+          <li><strong>Centralized patch management</strong> with full audit trail</li>
+          <li><strong>Content lifecycle:</strong> that April patch gets staged, tested, deployed &mdash; not ignored for 5 months</li>
+        </ul>
+      </div>
+      <div class="stack-card" style="border-top:3px solid var(--teal);">
+        <div class="sc-title" style="color:var(--teal);">OpenSCAP + Compliance</div>
+        <ul class="sc-items">
+          <li><strong>SCAP profiles</strong> enforced on every SAP host</li>
+          <li><strong>File integrity monitoring</strong> catches unauthorized webshells in SAP directories</li>
+          <li><strong>Continuous compliance scanning</strong> &mdash; persistent posture, not point-in-time audits</li>
+        </ul>
+      </div>
+      <div class="stack-card" style="border-top:3px solid var(--blue);">
+        <div class="sc-title blue">Ansible Automation Platform</div>
+        <ul class="sc-items">
+          <li><strong>Automated patching</strong> on schedule or on trigger</li>
+          <li><strong>Event-driven Ansible:</strong> file changes fire automated response</li>
+          <li><strong>Agentless</strong> &mdash; no additional software on SAP hosts</li>
+          <li><strong>Deployment audit chain</strong> &mdash; the evidence regulators require</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5: The Close -->
+  <div class="slide glow-bg" data-slide="5">
+    <div class="quote-block fade-up">
+      <div class="quote-mark">&ldquo;</div>
+      <div class="quote-text">
+        JLR spent &pound;800 million on a TCS cybersecurity and IT support contract. They still got breached through an unpatched SAP instance that had a fix available for five months. The tools existed. The patch existed. What didn't exist was a platform that surfaced the risk, enforced the policy, and closed the loop.<br><br>
+        <span style="color:var(--red); font-weight:700;">Lightspeed surfaces it. Satellite deploys it. Ansible enforces it.</span>
+      </div>
+    </div>
+    <div class="spacer-lg"></div>
+    <div class="big center amber fade-up delay-1">Ask the room.</div>
+    <div class="spacer"></div>
+    <div class="ask-grid fade-up delay-2">
+      <div class="ask-num">1</div>
+      <div class="ask-text">How long does it take your team to deploy a critical SAP security patch across your entire landscape?</div>
+      <div class="ask-num">2</div>
+      <div class="ask-text">If CISA adds a CVE to the KEV catalog today, can you tell me by end of day which of your SAP systems are exposed?</div>
+      <div class="ask-num">3</div>
+      <div class="ask-text">If your SAP ERP went down for five weeks, what's that worth to your business?</div>
+      <div class="ask-num">4</div>
+      <div class="ask-text">Can you show your auditor, right now, a complete deployment history for every patch on every SAP host?</div>
+    </div>
+  </div>
+
+  <!-- 6: Sources -->
+  <div class="slide" data-slide="6">
+    <div class="big center fade-up" style="margin-bottom:0.8vh;">Sources</div>
+    <div class="source-cols fade-up delay-1">
+      <div class="source-section">
+        <div class="src-head">JLR INCIDENT</div>
+        <div class="src-item">Kegate &mdash; JLR 2025 Cyberattack Technical Analysis (Nov 2025)</div>
+        <div class="src-item">InfraShield &mdash; JLR Cyberattack: IT-OT Convergence</div>
+        <div class="src-item">CyberSecureFox &mdash; JLR Ransomware Disrupts SAP/ERP</div>
+        <div class="src-item">Infosecurity Magazine &mdash; JLR Extends Pause (Sep 2025)</div>
+        <div class="src-item">BleepingComputer &mdash; JLR Extends Shutdown (Sep 2025)</div>
+      </div>
+      <div class="source-section">
+        <div class="src-head">CVE-2025-31324</div>
+        <div class="src-item">Rapid7 &mdash; Active Exploitation of SAP NetWeaver (Apr 2025)</div>
+        <div class="src-item">Unit 42 (Palo Alto) &mdash; Threat Brief CVE-2025-31324 (Jun 2025)</div>
+        <div class="src-item">CISA Known Exploited Vulnerabilities Catalog</div>
+      </div>
+      <div class="source-section">
+        <div class="src-head">RED HAT FOR SAP</div>
+        <div class="src-item">Red Hat &mdash; Powering SAP NetWeaver on RHEL 8</div>
+        <div class="src-item">Red Hat &mdash; RHEL for SAP Solutions 10 Documentation</div>
+        <div class="src-item">Red Hat &mdash; Lightspeed Vulnerability Service (SAP SID filtering)</div>
+      </div>
+    </div>
+    <div class="spacer-lg"></div>
+    <div class="brand fade-up delay-2" style="justify-content:center;">
+      <span class="rh">RED HAT</span><span class="sep">&times;</span><span class="sap">SAP</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let current = 0;
+
+const progressEl = document.getElementById('progress');
+const slideNumEl = document.getElementById('slideNum');
+
+function showSlide(n) {
+  if (n < 0 || n >= total) return;
+  slides[current].classList.remove('active');
+  current = n;
+  slides[current].classList.add('active');
+  progressEl.style.width = ((current+1)/total*100)+'%';
+  slideNumEl.innerText = (current+1)+' / '+total;
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').disabled = current === total - 1;
+
+  // Optional: notify OHC cluster
+  fetch('/ingest', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({specversion:'1.0', type:'presenter.slide_change', source:'present-jlr',
+      data:{slide:current+1, total:total}})
+  }).catch(()=>{});
+}
+function next() { showSlide(current+1); }
+function prev() { showSlide(current-1); }
+
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key===' '||e.key==='PageDown') { e.preventDefault(); next(); }
+  if (e.key==='ArrowLeft'||e.key==='PageUp') { e.preventDefault(); prev(); }
+  if (e.key==='Home') { e.preventDefault(); showSlide(0); }
+  if (e.key==='End') { e.preventDefault(); showSlide(total-1); }
+  if (e.key==='f'||e.key==='F') {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+});
+
+let touchStartX = 0, touchStartY = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; }, {passive:true});
+document.addEventListener('touchend', e => {
+  const dx = touchStartX - e.changedTouches[0].clientX;
+  const dy = touchStartY - e.changedTouches[0].clientY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) { dx > 0 ? next() : prev(); }
+}, {passive:true});
+
+document.addEventListener('click', e => {
+  if (e.target.closest('a,button')) return;
+  if (e.clientX < window.innerWidth * 0.2) prev(); else next();
+});
+
+showSlide(0);
+</script>
+
+<!-- C2PA Content Credentials disclosure -->
+<div style="position:fixed;bottom:8px;right:12px;z-index:9999;font-family:'Red Hat Text',system-ui,sans-serif;font-size:12px;line-height:16px;color:#666;opacity:0.8;pointer-events:auto;">
+<a href="https://contentcredentials.org/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" style="width:16px;height:16px;vertical-align:middle;fill:currentColor;margin-right:4px"><path fill-rule="evenodd" clip-rule="evenodd" d="M14.6,8v6.6H8c-3.7,0-6.6-3-6.6-6.6s3-6.6,6.6-6.6S14.6,4.3,14.6,8z M0,8c0-4.4,3.6-8,8-8s8,3.6,8,8v8H8 C3.6,16,0,12.4,0,8z M3.2,8.3c0,1.6,1.1,3,2.9,3c1.5,0,2.4-1,2.7-2.2H7.3c-0.2,0.6-0.6,0.9-1.2,0.9c-0.9,0-1.5-0.7-1.5-1.8 s0.6-1.8,1.5-1.8c0.6,0,1,0.3,1.2,0.9h1.4C8.5,6.2,7.5,5.3,6.1,5.3C4.3,5.3,3.2,6.7,3.2,8.3z M10.7,5.4H9.3v5.8h1.4v-3 c0-0.6,0.2-0.9,0.4-1.2c0.2-0.2,0.6-0.3,1.1-0.3h0.4V5.4h-0.4c-0.8,0-1.2,0.3-1.6,0.7L10.7,5.4L10.7,5.4z"/></svg>Contains AI-generated content</a>
+</div>
+</body>
+</html>

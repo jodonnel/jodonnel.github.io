@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Don't Be JLR — OpenSCAP at Every Layer</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Text:wght@300;400;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/ini.min.js"></script>
+<style>
+:root {
+  --bg: #06090F; --surface: #0D1117; --border: #1C2333;
+  --muted: #4E5D6C; --text: #F0F4F8; --dim: #BBBBAA;
+  --red: #EE0000; --gold: #F0AB00; --blue: #3B82F6;
+  --green: #22C55E; --amber: #D97706;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
+body { background: var(--bg); color: var(--text); font-family: 'Red Hat Display', sans-serif; }
+
+/* ── Slide layout ── */
+section {
+  min-height: 100vh; scroll-snap-align: start;
+  padding: 6vh 8vw; display: flex; flex-direction: column; justify-content: center;
+  border-bottom: 1px solid var(--border);
+}
+section.title-slide {
+  justify-content: center; align-items: center; text-align: center;
+}
+
+/* ── Typography ── */
+h1 { font-size: 3.2rem; font-weight: 900; line-height: 1.1; }
+h2 { font-size: 2.2rem; font-weight: 900; margin-bottom: 1rem; }
+h3 { font-size: 1.3rem; font-weight: 700; margin-top: 1.8rem; margin-bottom: 0.6rem; }
+p, li { font-family: 'Red Hat Text', sans-serif; font-size: 1.15rem; color: var(--dim); line-height: 1.7; max-width: 72ch; }
+li { margin-bottom: 0.5rem; }
+ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+strong { color: var(--text); }
+.red { color: var(--red); }
+.gold { color: var(--gold); }
+.blue { color: var(--blue); }
+
+.subtitle { font-family: 'Red Hat Text', sans-serif; font-size: 1.3rem; color: var(--muted); margin-top: 1rem; max-width: 52ch; }
+.layer-tag { display: inline-block; font-family: 'Red Hat Mono', monospace; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.25rem 0.7rem; border-radius: 3px; margin-bottom: 1.5rem; }
+.tag-cli { background: rgba(59,130,246,0.15); color: var(--blue); }
+.tag-console { background: rgba(240,171,0,0.15); color: var(--gold); }
+.tag-aap { background: rgba(238,0,0,0.15); color: var(--red); }
+.tag-satellite { background: rgba(34,197,94,0.15); color: var(--green); }
+.tag-image { background: rgba(217,119,6,0.15); color: var(--amber); }
+.tag-insights { background: rgba(240,171,0,0.15); color: var(--gold); }
+
+/* ── Boxes ── */
+.box { padding: 1.2rem 1.5rem; margin: 1rem 0; background: var(--surface); border-radius: 4px; }
+.box-red { border-left: 4px solid var(--red); }
+.box-gold { border-left: 4px solid var(--gold); }
+.box-blue { border-left: 4px solid var(--blue); }
+.box-green { border-left: 4px solid var(--green); }
+
+/* ── Code ── */
+code { font-family: 'Red Hat Mono', monospace; background: rgba(240,171,0,0.1); color: var(--gold); padding: 0.15rem 0.5rem; border-radius: 3px; font-size: 1rem; }
+pre { font-family: 'Red Hat Mono', monospace; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--blue); border-radius: 4px; padding: 1.2rem 1.5rem; font-size: 0.95rem; line-height: 1.6; color: var(--dim); overflow-x: auto; margin: 0.8rem 0; max-width: 900px; }
+pre code.hljs { background: transparent; padding: 0; font-family: 'Red Hat Mono', monospace; font-size: 0.95rem; }
+.hljs { background: transparent; }
+.hljs-comment { color: #6A737D; }
+.hljs-keyword, .hljs-selector-tag { color: #FF7B72; }
+.hljs-string, .hljs-attr { color: #A5D6FF; }
+.hljs-variable, .hljs-template-variable { color: #FFA657; }
+.hljs-built_in { color: #D2A8FF; }
+.hljs-title, .hljs-section { color: #D2A8FF; font-weight: 700; }
+.hljs-number { color: #79C0FF; }
+.hljs-literal { color: #79C0FF; }
+.hljs-meta { color: #F0AB00; }
+
+/* ── Grid ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem; max-width: 1100px; }
+
+/* ── Click / Say blocks ── */
+.click { border-left: 4px solid var(--blue); background: rgba(59,130,246,0.06); padding: 1rem 1.3rem; margin: 0.8rem 0; border-radius: 4px; }
+.say { border-left: 4px solid var(--gold); background: rgba(240,171,0,0.06); padding: 1rem 1.3rem; margin: 0.8rem 0; border-radius: 4px; }
+.warn { border-left: 4px solid var(--red); background: rgba(238,0,0,0.06); padding: 1rem 1.3rem; margin: 0.8rem 0; border-radius: 4px; }
+.label { font-family: 'Red Hat Mono', monospace; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 0.5rem; }
+.l-click { color: var(--blue); }
+.l-say { color: var(--gold); }
+.l-warn { color: var(--red); }
+.l-run { color: var(--green); }
+
+/* ── Table ── */
+table { border-collapse: collapse; margin: 1rem 0; max-width: 1000px; }
+th, td { font-family: 'Red Hat Text', sans-serif; font-size: 1rem; padding: 0.6rem 1rem; text-align: left; border-bottom: 1px solid var(--border); color: var(--dim); }
+th { color: var(--text); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* ── Nav dots ── */
+nav.dots { position: fixed; right: 1.5rem; top: 50%; transform: translateY(-50%); z-index: 10; display: flex; flex-direction: column; gap: 0.6rem; }
+nav.dots a { display: block; width: 10px; height: 10px; border-radius: 50%; background: var(--muted); opacity: 0.4; transition: opacity 0.2s, background 0.2s; }
+nav.dots a:hover, nav.dots a.active { opacity: 1; background: var(--red); }
+
+/* ── Cost ticker ── */
+.cost { font-family: 'Red Hat Mono', monospace; font-size: 4rem; font-weight: 900; color: var(--red); letter-spacing: -0.02em; }
+.cost-label { font-size: 1rem; color: var(--muted); margin-top: 0.3rem; }
+
+/* ── Connector line ── */
+.stack-flow { display: flex; flex-direction: column; gap: 0; margin: 1.5rem 0; max-width: 700px; }
+.stack-item { display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1.2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; }
+.stack-item + .stack-item { margin-top: -1px; }
+.stack-num { font-family: 'Red Hat Mono', monospace; font-size: 1.4rem; font-weight: 900; color: var(--red); min-width: 2rem; text-align: center; }
+.stack-label { font-weight: 700; color: var(--text); }
+.stack-desc { font-family: 'Red Hat Text', sans-serif; font-size: 0.9rem; color: var(--muted); }
+
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+@media (max-width: 768px) {
+  section { padding: 4vh 5vw; }
+  h1 { font-size: 2.2rem; }
+  h2 { font-size: 1.6rem; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .cost { font-size: 2.5rem; }
+}
+</style>
+</head>
+<body>
+
+<nav class="dots" id="nav-dots"></nav>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 0: TITLE -->
+<!-- ════════════════════════════════════════════ -->
+<section class="title-slide" id="s0">
+  <p style="font-family:'Red Hat Mono',monospace; font-size:0.85rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:2rem;">Workshop</p>
+  <h1>Don't Be <span class="red">JLR</span></h1>
+  <p class="subtitle">Compliance from the command line to the control plane.<br>OpenSCAP at every layer of Red Hat.</p>
+  <div style="margin-top:3rem; font-family:'Red Hat Text',sans-serif; font-size:0.95rem; color:var(--muted);">
+    Jim O'Donnell &nbsp;·&nbsp; Senior Specialist Solution Architect &nbsp;·&nbsp; Red Hat
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 1: THE COST OF NOT SCANNING -->
+<!-- ════════════════════════════════════════════ -->
+<section id="s1">
+  <h2>The Cost of <span class="red">Not Scanning</span></h2>
+
+  <div class="grid-2">
+    <div>
+      <div class="cost">£1.4B</div>
+      <div class="cost-label">Modeled total loss — Jaguar Land Rover, 2025</div>
+      <p style="margin-top:1.5rem;">Two attacks. Five months of an unpatched SAP system. Three factories dark. 27% drop in UK auto production.</p>
+      <p><strong>Costliest cyberattack in British history.</strong></p>
+    </div>
+    <div>
+      <div class="box box-red">
+        <p class="label l-warn">THE KILL CHAIN</p>
+        <ol>
+          <li>Credentials stolen in 2021, <strong>never rotated</strong></li>
+          <li>Jira recon maps the SAP landscape</li>
+          <li>CVE-2025-31324 (CVSS 10.0) — <strong>unpatched for 5 months</strong></li>
+          <li>Webshell executes on <strong>unconfined OS</strong></li>
+          <li>Lateral movement to the factory floor</li>
+          <li>350 GB exfiltrated. Total shutdown.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="say" style="margin-top:2rem;">
+    <p class="label l-say">THE QUESTION</p>
+    <p>"At which of these six steps would your current tooling have caught this? Because Red Hat catches it at <strong>every single one</strong>. Let me show you how."</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 2: THE STACK -->
+<!-- ════════════════════════════════════════════ -->
+<section id="s2">
+  <h2>OpenSCAP Lives at <span class="gold">Six Layers</span></h2>
+  <p>Same compliance engine. Different altitude. Each layer builds on the one below it.</p>
+
+  <div class="stack-flow" style="margin-top:2rem;">
+    <div class="stack-item">
+      <div class="stack-num">1</div>
+      <div><span class="stack-label">Image Builder / Kickstart</span><br><span class="stack-desc">Compliance baked in at birth. The system is born hardened.</span></div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-num">2</div>
+      <div><span class="stack-label">CLI — <code>oscap</code></span><br><span class="stack-desc">Ad-hoc scan. Generate report. Generate remediation. One host.</span></div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-num">3</div>
+      <div><span class="stack-label">Red Hat Insights / Lightspeed Compliance</span><br><span class="stack-desc">Cloud compliance dashboard. Fleet-wide posture. Policy assignment.</span></div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-num">4</div>
+      <div><span class="stack-label">Ansible Automation Platform</span><br><span class="stack-desc">Deploy scans at scale. Auto-remediate. Enforce policy as code.</span></div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-num">5</div>
+      <div><span class="stack-label">Red Hat Satellite</span><br><span class="stack-desc">On-prem nerve center. Schedule scans, manage content, compliance dashboards.</span></div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-num">6</div>
+      <div><span class="stack-label">The Full Loop</span><br><span class="stack-desc">Image → scan → report → remediate → re-scan → prove. Continuous compliance.</span></div>
+    </div>
+  </div>
+
+  <div class="say" style="margin-top:2rem;">
+    <p class="label l-say">SAY</p>
+    <p>"JLR had none of these. Not one. An unpatched, unscanned, unconfined SAP system sitting on the internet for five months. We're going to walk through each layer so you can see exactly where you stand — and where the gaps are."</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 3: LAYER 1 — IMAGE BUILDER / KICKSTART -->
+<!-- ════════════════════════════════════════════ -->
+<section id="s3">
+  <span class="layer-tag tag-image">Layer 1 — Image Builder / Kickstart</span>
+  <h2>Born Hardened</h2>
+  <p>Compliance starts before the first login. Bake a security profile into the OS image at build time — the system is compliant from the moment it boots.</p>
+
+  <h3>Kickstart — RHEL 7, 8, 9, 10</h3>
+  <div class="box box-gold">
+    <p>The <code>%addon com_redhat_oscap</code> Kickstart directive has worked since RHEL 7. Select a compliance profile and the installer enforces partitioning, password policy, SELinux mode, and service hardening <strong>before first boot</strong>. RHEL 9 also had a GUI spoke in Anaconda; RHEL 10 dropped the spoke but the Kickstart path is unchanged. This is the production workflow — compliance baked into every build, every time, no human clicking through an installer.</p>
+  </div>
+
+  <pre><code class="language-ini"># Kickstart — works on RHEL 7 through 10
+%addon com_redhat_oscap
+  content-type = scap-security-guide
+  profile = xccdf_org.ssgproject.content_profile_hipaa
+%end</code></pre>
+
+  <h3>Image Builder — Golden Images in a Pipeline</h3>
+  <pre><code class="language-bash"># Build a HIPAA-hardened RHEL 10 image
+composer-cli blueprints push rhel10-hipaa.toml
+composer-cli compose start rhel10-hipaa qcow2</code></pre>
+  <p>Image Builder takes it further — build compliant golden images in a CI pipeline. Every VM, every cloud instance, every edge device boots from the same hardened baseline. No drift from day one.</p>
+
+  <div class="say" style="margin-top:1.5rem;">
+    <p class="label l-say">SAY</p>
+    <p>"If JLR had built their SAP hosts from a STIG-hardened golden image, the webshell couldn't have executed. SELinux enforcing mode, locked-down file permissions, restricted services — all applied before anyone ever logged in. <strong>Day zero compliance.</strong>"</p>
+  </div>
+
+  <div class="warn">
+    <p class="label l-warn">JLR COUNTER</p>
+    <p><strong>Kill chain step 4:</strong> Webshell executes on unconfined OS. JLR ran SAP on SUSE — AppArmor has zero SAP profiles. A RHEL golden image with SELinux enforcing and a STIG profile blocks webshell execution before it starts.</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 4: LAYER 2 — CLI -->
+<!-- ════════════════════════════════════════════ -->
+<section id="s4">
+  <span class="layer-tag tag-cli">Layer 2 — CLI</span>
+  <h2>The Scanner in the Box</h2>
+  <p>Every RHEL subscription includes OpenSCAP and the SCAP Security Guide. More than 15 compliance profiles — HIPAA, DISA STIG, CIS Level 1 &amp; 2, PCI-DSS, NIST 800-53, NIST 800-171. No additional purchase required.</p>
+
+  <h3>Install</h3>
+  <pre><code class="language-bash">sudo dnf install -y openscap-scanner scap-security-guide</code></pre>
+
+  <h3>List available profiles</h3>
+  <pre><code class="language-bash">oscap info /usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml</code></pre>
+
+  <h3>Run a HIPAA scan</h3>
+  <pre><code class="language-bash">sudo oscap xccdf eval \
+  --profile xccdf_org.ssgproject.content_profile_hipaa \
+  --results /tmp/hipaa-results.xml \
+  --report /tmp/hipaa-report.html \
+  /usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml</code></pre>
+
+  <div class="click">
+    <p class="label l-click">SHOW</p>
+    <p>Open <code>/tmp/hipaa-report.html</code> in a browser. Every rule — pass or fail — with severity, description, and remediation guidance. This is audit evidence.</p>
+  </div>
+
+  <h3>Generate an Ansible remediation playbook</h3>
+  <pre><code class="language-bash">sudo oscap xccdf generate fix \
+  --fix-type ansible \
+  --profile xccdf_org.ssgproject.content_profile_hipaa \
+  --output /tmp/hipaa-remediate.yml \
+  /usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml</code></pre>
+
+  <div class="say" style="margin-top:1.5rem;">
+    <p class="label l-say">SAY</p>
+    <p>"You just scanned a system against HIPAA, generated an HTML report you can hand to an auditor, and generated an Ansible playbook that fixes every failure — in three commands. This ships free with your RHEL subscription."</p>
+  </div>
+
+  <div class="warn">
+    <p class="label l-warn">JLR COUNTER</p>
+    <p><strong>Kill chain step 3:</strong> CVE-2025-31324 sat unpatched for 5 months. A weekly <code>oscap</code> scan would have flagged the drift from the security baseline the moment the system fell out of compliance. The report would have shown exactly what to fix.</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 5: LAYER 3 — INSIGHTS / LIGHTSPEED COMPLIANCE -->
+<!-- ════════════════════════════════════════════ -->
+<section id="s5">
+  <span class="layer-tag tag-insights">Layer 3 — Red Hat Insights / Lightspeed Compliance</span>
+  <h2>Fleet-Wide Visibility</h2>
+  <p>One dashboard. Every host. Every policy. Every score. No infrastructure to run — it's in your RHEL subscription.</p>
+
+  <h3>How it works</h3>
+  <ol>
+    <li>Register hosts with <code>insights-client --register</code></li>
+    <li>Create a compliance policy at <strong>console.redhat.com → Security → Compliance</strong></li>
+    <li>Select a profile (HIPAA, STIG, CIS, PCI-DSS)</li>
+    <li>Assign systems to the policy</li>
+    <li>Hosts run <code>insights-client --compliance</code> (scheduled or on-demand)</li>
+    <li>Results appear in the cloud dashboard — scores, failures, trends</li>
+  </ol>
+
+  <div class="click">
+    <p class="label l-click">SHOW</p>
+    <p>Navigate to <strong>console.redhat.com</strong> → <strong>Security</strong> → <strong>Compliance</strong> → <strong>SCAP Policies</strong>. Create a new policy. Select HIPAA. Assign hosts. Show the compliance score dashboard.</p>
+  </div>
+
+  <div class="box box-gold" style="margin-top:1.5rem;">
+    <p><strong>Key differentiator:</strong> The compliance service correlates with <strong>Insights Advisor</strong> (configuration risks), <strong>Vulnerability</strong> (CVE exposure), and <strong>Patch</strong> (available errata). One console shows compliance posture, security vulnerabilities, and patch status together. No separate tool.</p>
+  </div>
+
+  <div class="say" style="margin-top:1.5rem;">
+    <p class="label l-say">SAY</p>
+    <p>"This is where the security team lives. You're not SSHing into boxes to run scans. You're looking at a dashboard that tells you: 14 out of 200 hosts failed the HIPAA password-complexity rule. Click. Here they are. Click. Here's the remediation. That's the difference between knowing you have a problem and <strong>finding it after the breach</strong>."</p>
+  </div>
+
+  <div class="warn">
+    <p class="label l-warn">JLR COUNTER</p>
+    <p><strong>Kill chain step 3:</strong> Insights Vulnerability service would have flagged CVE-2025-31324 in April 2025 — <strong>the month the patch dropped</strong>. Not five months later when the attackers found it.</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 6: LAYER 4 — ANSIBLE AUTOMATION PLATFORM -->
+<!-- ════════════════════════════════════════════ -->
+<section id="s6">
+  <span class="layer-tag tag-aap">Layer 4 — Ansible Automation Platform</span>
+  <h2>Compliance as Code</h2>
+  <p>Scanning one host is a demo. Scanning 10,000 hosts on a schedule and auto-remediating failures — that's Ansible.</p>
+
+  <h3>Deploy SCAP scanning fleet-wide</h3>
+  <div class="box box-blue">
+    <p>The <code>theforeman.foreman_scap_client</code> Ansible role installs the SCAP client, configures scan policies, and schedules scans on every host in a host group. One playbook. Entire fleet.</p>
+  </div>
+
+  <pre><code class="language-yaml"># Deploy SCAP client to all RHEL hosts
+- name: Deploy OpenSCAP compliance scanning
+  hosts: rhel_servers
+  roles:
+    - role: theforeman.foreman_scap_client
+      vars:
+        foreman_scap_client_server: satellite.example.com
+        foreman_scap_client_port: 9090
+        foreman_scap_client_policies:
+          - id: 1
+            profile: hipaa</code></pre>
+
+  <h3>Auto-remediate from scan results</h3>
+  <pre><code class="language-yaml"># Run the remediation playbook generated by oscap
+- name: Remediate HIPAA failures
+  hosts: failed_hipaa
+  become: true
+  tasks:
+    - ansible.builtin.include_tasks: hipaa-remediate.yml</code></pre>
+
+  <h3>In AAP Controller</h3>
+  <div class="click">
+    <p class="label l-click">SHOW</p>
+    <p><strong>AAP Controller</strong> → Templates → create a Job Template for the SCAP deployment playbook. Set a <strong>Schedule</strong> (weekly). Assign to an <strong>Inventory</strong> that pulls from Satellite. Every new host gets scanned automatically.</p>
+  </div>
+
+  <div class="say" style="margin-top:1.5rem;">
+    <p class="label l-say">SAY</p>
+    <p>"Here's where it gets serious. You're not asking people to remember to scan. You're not hoping someone runs a script. Ansible deploys the scanner, schedules the scans, collects the results, and — if you want — <strong>auto-remediates the failures</strong>. Compliance isn't a quarterly audit anymore. It's a continuous loop."</p>
+  </div>
+
+  <div class="warn">
+    <p class="label l-warn">JLR COUNTER</p>
+    <p><strong>Kill chain step 1:</strong> AAP enforces credential rotation policies — 90-day max. The stolen Jira credentials from 2021 would have been rotated long before Hellcat used them in March 2025.</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 7: LAYER 5 — SATELLITE -->
+<!-- ════════════════════════════════════════════ -->
+<section id="s7">
+  <span class="layer-tag tag-satellite">Layer 5 — Red Hat Satellite</span>
+  <h2>The On-Prem Nerve Center</h2>
+  <p>Satellite is where compliance policy meets content management. Upload SCAP content, create policies, assign them to host groups, schedule scans, and view compliance dashboards — all from one UI. Nothing leaves your network.</p>
+
+  <h3>Enable OpenSCAP</h3>
+  <pre><code class="language-bash"># On the Satellite server
+satellite-installer --enable-foreman-plugin-openscap
+
+# Upload default SCAP content
+hammer scap-content bulk-upload --type default</code></pre>
+
+  <h3>Create a compliance policy</h3>
+  <div class="click">
+    <p class="label l-click">CLICK</p>
+    <p><strong>Satellite Web UI</strong> → <strong>Hosts</strong> → <strong>Compliance</strong> → <strong>Policies</strong> → <strong>New Policy</strong></p>
+    <ol>
+      <li><strong>Deployment method:</strong> Ansible (or Puppet or Manual)</li>
+      <li><strong>Name:</strong> "HIPAA — Production RHEL 9"</li>
+      <li><strong>SCAP Content:</strong> Red Hat rhel9-default content</li>
+      <li><strong>XCCDF Profile:</strong> HIPAA</li>
+      <li><strong>Tailoring File:</strong> (optional — customize which rules apply)</li>
+      <li><strong>Schedule:</strong> Weekly, Sunday 02:00</li>
+      <li><strong>Host Groups:</strong> assign your target groups</li>
+    </ol>
+  </div>
+
+  <h3>View compliance dashboard</h3>
+  <div class="click">
+    <p class="label l-click">CLICK</p>
+    <p><strong>Hosts</strong> → <strong>Compliance</strong> → <strong>Policies</strong> → select policy → <strong>Dashboard</strong>. Shows: compliant count, non-compliant count, not yet scanned. Click any host for the full rule-by-rule breakdown.</p>
+  </div>
+
+  <h3>View individual host compliance</h3>
+  <div class="click">
+    <p class="label l-click">CLICK</p>
+    <p><strong>Hosts</strong> → <strong>All Hosts</strong> → click a host → <strong>Compliance</strong> tab. Shows every policy assigned to this host, last scan date, compliance score, and the full SCAP report.</p>
+  </div>
+
+  <div class="say" style="margin-top:1.5rem;">
+    <p class="label l-say">SAY</p>
+    <p>"This is what Ken's been looking for. One screen that says: here are my 200 RHEL hosts, here's which ones are compliant with HIPAA, here's which ones failed, here's exactly what they failed on. No SSH. No scripts. No spreadsheets. And it's on-prem — nothing leaves your network."</p>
+  </div>
+
+  <div class="warn">
+    <p class="label l-warn">JLR COUNTER</p>
+    <p><strong>Kill chain step 6:</strong> Satellite + OpenSCAP detects configuration drift within the scan cycle. A webshell that modifies system files, opens new ports, or changes SELinux booleans would trigger compliance failures on the next scan. The dashboard goes red. You see it before the attacker finishes.</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 8: LAYER 6 — THE FULL LOOP -->
+<!-- ════════════════════════════════════════════ -->
+<section id="s8">
+  <span class="layer-tag tag-image">Layer 6 — The Full Loop</span>
+  <h2>Continuous Compliance</h2>
+  <p>Each layer reinforces the others. The system is born hardened, continuously scanned, centrally managed, automatically remediated, and auditably reported.</p>
+
+  <div class="grid-2" style="margin-top:2rem;">
+    <div class="box box-green">
+      <h3 style="margin-top:0;">The Loop</h3>
+      <ol>
+        <li><strong>Build:</strong> Image Builder bakes STIG/HIPAA into the golden image</li>
+        <li><strong>Deploy:</strong> Satellite provisions from the golden image</li>
+        <li><strong>Scan:</strong> AAP deploys SCAP client, schedules weekly scans</li>
+        <li><strong>Report:</strong> Results flow to Satellite dashboard + Insights console</li>
+        <li><strong>Remediate:</strong> AAP auto-fixes failures or generates tickets</li>
+        <li><strong>Re-scan:</strong> Next cycle validates the fix</li>
+        <li><strong>Prove:</strong> Auditor gets the HTML report. Done.</li>
+      </ol>
+    </div>
+    <div>
+      <h3 style="margin-top:0;">JLR Had None of This</h3>
+      <table>
+        <tr><th>Attack Step</th><th>Red Hat Layer</th></tr>
+        <tr><td>Credentials never rotated</td><td>AAP enforces rotation</td></tr>
+        <tr><td>Jira recon maps SAP</td><td>IdM + centralized logging</td></tr>
+        <tr><td>CVE unpatched 5 months</td><td>Insights flags it day one</td></tr>
+        <tr><td>Webshell on unconfined OS</td><td>SELinux + STIG image</td></tr>
+        <tr><td>Lateral movement</td><td>firewalld + segmentation</td></tr>
+        <tr><td>350GB exfil, shutdown</td><td>OpenSCAP detects drift</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="say" style="margin-top:2rem;">
+    <p class="label l-say">SAY</p>
+    <p>"This isn't six separate products. It's one platform. RHEL is the foundation. Satellite is the manager. Ansible is the muscle. Insights is the eyes. And OpenSCAP is the standard that ties them all together. <strong>JLR had none of it.</strong> You already have most of it. Let's close the gaps."</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 9: WHAT TO DO MONDAY -->
+<!-- ════════════════════════════════════════════ -->
+<section id="s9">
+  <h2>What To Do <span class="gold">Monday</span></h2>
+  <p>You don't need to buy anything. You don't need a project plan. Start here.</p>
+
+  <div class="grid-2" style="margin-top:1.5rem;">
+    <div class="box box-gold">
+      <h3 style="margin-top:0;">This Week</h3>
+      <ol>
+        <li><strong>Pick one host.</strong> Install <code>openscap-scanner</code> and <code>scap-security-guide</code>.</li>
+        <li><strong>Run one scan.</strong> Use the HIPAA or STIG profile. Open the HTML report.</li>
+        <li><strong>Count the failures.</strong> That's your current compliance posture. Now you know.</li>
+      </ol>
+    </div>
+    <div class="box box-blue">
+      <h3 style="margin-top:0;">This Month</h3>
+      <ol>
+        <li><strong>Register hosts with Insights.</strong> <code>insights-client --register</code> on 10 hosts.</li>
+        <li><strong>Create a compliance policy</strong> in console.redhat.com.</li>
+        <li><strong>Run <code>insights-client --compliance</code></strong> and watch the dashboard light up.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="box box-red" style="margin-top:1.5rem; max-width:700px;">
+    <h3 style="margin-top:0;">This Quarter</h3>
+    <ol>
+      <li><strong>Enable OpenSCAP in Satellite.</strong> Upload SCAP content. Create policies. Assign host groups.</li>
+      <li><strong>Deploy SCAP client via AAP.</strong> One playbook, entire fleet, scheduled scans.</li>
+      <li><strong>Build a golden image.</strong> Image Builder + compliance profile. Every new host is born compliant.</li>
+    </ol>
+  </div>
+
+  <div class="say" style="margin-top:2rem;">
+    <p class="label l-say">SAY</p>
+    <p>"JLR's breach cost them a billion pounds and it started with things a free scan would have caught. You don't need a new tool. You need to turn on the ones you already have."</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- SLIDE 10: RESOURCES -->
+<!-- ════════════════════════════════════════════ -->
+<section id="s10">
+  <h2>Resources</h2>
+
+  <h3>Documentation</h3>
+  <ul>
+    <li><strong>RHEL 9 Security Hardening:</strong> docs.redhat.com — "Scanning the system for configuration compliance"</li>
+    <li><strong>Satellite 6.16–6.18 Compliance:</strong> docs.redhat.com — "Managing security compliance"</li>
+    <li><strong>Insights Compliance:</strong> console.redhat.com → Security → Compliance</li>
+    <li><strong>Lightspeed Compliance Service:</strong> docs.redhat.com — "Assessing and monitoring security policy compliance"</li>
+    <li><strong>SCAP Security Guide profiles:</strong> static.open-scap.org/ssg-guides/</li>
+  </ul>
+
+  <h3>Ansible Content</h3>
+  <ul>
+    <li><code>theforeman.foreman_scap_client</code> — deploy SCAP scanning via Satellite</li>
+    <li><code>oscap xccdf generate fix --fix-type ansible</code> — generate remediation playbooks from scan results</li>
+    <li>Red Hat Gov workshop: redhatgov.io/workshops/rhel_8/exercise1.7/</li>
+  </ul>
+
+  <h3>The JLR Story</h3>
+  <ul>
+    <li>The Guardian — "Jaguar Land Rover hack stalls factories" (Sep 2025)</li>
+    <li>Safe Security — FAIR-MAM analysis, modeled total loss</li>
+    <li>Onapsis — CVE-2025-31324 threat intelligence</li>
+    <li><code>function_sap_cve31324_scan</code> — open-source Ansible scanner (6-phase detection)</li>
+  </ul>
+
+  <div style="margin-top:3rem; text-align:center; color:var(--muted); font-family:'Red Hat Text',sans-serif;">
+    <p>Jim O'Donnell &nbsp;·&nbsp; jim.odonnell@gmail.com &nbsp;·&nbsp; Red Hat</p>
+  </div>
+</section>
+
+<script>
+// Navigation dots
+const sections = document.querySelectorAll('section');
+const nav = document.getElementById('nav-dots');
+sections.forEach((s, i) => {
+  const a = document.createElement('a');
+  a.href = '#' + s.id;
+  a.title = 'Slide ' + (i + 1);
+  nav.appendChild(a);
+});
+const dots = nav.querySelectorAll('a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      dots.forEach(d => d.classList.remove('active'));
+      const idx = Array.from(sections).indexOf(e.target);
+      if (dots[idx]) dots[idx].classList.add('active');
+    }
+  });
+}, { threshold: 0.5 });
+sections.forEach(s => observer.observe(s));
+hljs.highlightAll();
+</script>
+
+
+<!-- C2PA Content Credentials disclosure -->
+<div style="position:fixed;bottom:8px;right:12px;z-index:9999;font-family:'Red Hat Text',system-ui,sans-serif;font-size:12px;line-height:16px;color:#666;opacity:0.8;pointer-events:auto;">
+<a href="https://contentcredentials.org/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" style="width:16px;height:16px;vertical-align:middle;fill:currentColor;margin-right:4px"><path fill-rule="evenodd" clip-rule="evenodd" d="M14.6,8v6.6H8c-3.7,0-6.6-3-6.6-6.6s3-6.6,6.6-6.6S14.6,4.3,14.6,8z M0,8c0-4.4,3.6-8,8-8s8,3.6,8,8v8H8 C3.6,16,0,12.4,0,8z M3.2,8.3c0,1.6,1.1,3,2.9,3c1.5,0,2.4-1,2.7-2.2H7.3c-0.2,0.6-0.6,0.9-1.2,0.9c-0.9,0-1.5-0.7-1.5-1.8 s0.6-1.8,1.5-1.8c0.6,0,1,0.3,1.2,0.9h1.4C8.5,6.2,7.5,5.3,6.1,5.3C4.3,5.3,3.2,6.7,3.2,8.3z M10.7,5.4H9.3v5.8h1.4v-3 c0-0.6,0.2-0.9,0.4-1.2c0.2-0.2,0.6-0.3,1.1-0.3h0.4V5.4h-0.4c-0.8,0-1.2,0.3-1.6,0.7L10.7,5.4L10.7,5.4z"/></svg>Contains AI-generated content</a>
+</div>
+</body>
+</html>
