@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Easy Version — Getting Seen & Getting Covered</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Figtree:wght@400;500;600;700&display=swap');
+:root{
+  --paper:#16130f; --ink:#efe6d6; --muted:#a99c87;
+  --accent:#ff5b2e; --gold:#e3b15a; --olive:#9aa06b; --hair:#352e26;
+  --ember:#241a13;
+  --serif:"Fraunces",Georgia,serif;
+  --sans:"Figtree",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;}
+html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{ margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:18px; line-height:1.65; font-feature-settings:"kern" 1; }
+.page{ max-width:880px; margin:0 auto; padding:4.5rem 1.6rem 3rem; }
+.kicker{ font-weight:600; letter-spacing:.16em; text-transform:uppercase;
+  font-size:.74rem; color:var(--accent); margin:0 0 .9rem; }
+h1{ font-family:var(--serif); font-weight:600; font-size:clamp(2.4rem,6vw,3.5rem);
+  line-height:1.02; letter-spacing:-.01em; margin:0 0 .3rem; max-width:15ch; }
+.squiggle{ display:block; width:180px; height:14px; color:var(--accent); margin:.2rem 0 1.1rem; }
+.dek{ font-family:var(--serif); font-size:1.28rem; font-style:italic; color:var(--muted);
+  font-weight:400; margin:0 0 1.6rem; max-width:50ch; line-height:1.4; }
+.intro{ font-size:1.12rem; max-width:60ch; margin:0 0 .6rem; }
+.intro strong{ font-weight:600; }
+
+/* START HERE panel */
+.cta{ background:var(--ember); border:1px solid var(--hair); border-radius:10px;
+  padding:1.6rem 1.8rem 1.7rem; margin:2.2rem 0 1.4rem; break-inside:avoid;
+  box-shadow:inset 0 0 0 1px rgba(255,91,46,.06); }
+.cta .tag{ display:inline-block; font-family:var(--sans); font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase; font-size:.7rem; color:var(--paper);
+  background:var(--accent); padding:.32rem .7rem; border-radius:4px; margin-bottom:1rem; }
+.cta h2{ font-family:var(--serif); font-weight:600; font-size:1.7rem; line-height:1.12;
+  margin:0 0 .5rem; letter-spacing:-.01em; }
+.cta .price{ font-family:var(--serif); color:var(--gold); font-weight:600; }
+.cta p{ margin:.55rem 0 0; max-width:62ch; }
+.cta a{ color:var(--accent); text-decoration:none; border-bottom:1px solid var(--hair); }
+.cta .phone{ font-family:var(--serif); font-weight:600; color:var(--ink); white-space:nowrap; }
+
+.step{ display:grid; grid-template-columns:3.8rem 1fr; gap:0; align-items:start;
+  padding:2.6rem 0 .4rem 0; }
+.step .num{ font-family:var(--serif); font-weight:600; font-size:2.5rem; color:var(--gold);
+  line-height:1; text-align:right; padding:.15rem 1.1rem 0 0; }
+.step .body{ border-left:2px solid var(--hair); padding-left:1.5rem; }
+.step.keep{ break-inside:avoid; }
+.step h2{ font-family:var(--serif); font-weight:600; font-size:1.7rem; line-height:1.15;
+  margin:.1rem 0 .2rem; letter-spacing:-.01em; break-after:avoid; }
+.menu .row, ol.detail li, .shortlist, .pull, .note, .bring li{ break-inside:avoid; }
+.step .sub{ color:var(--muted); margin:0 0 1.1rem; max-width:58ch; }
+.menu{ margin:1.2rem 0 .6rem; }
+.menu .row{ padding:1.05rem 0; border-bottom:1px solid var(--hair); }
+.menu .row:first-child{ border-top:1px solid var(--hair); }
+.menu .head{ display:flex; align-items:baseline; gap:.6rem; padding-right:.3rem; }
+.menu .name{ font-family:var(--serif); font-weight:600; font-size:1.18rem; }
+.menu .lead{ flex:1; border-bottom:1.5px dotted var(--hair); transform:translateY(-.28rem); }
+.menu .tag{ font-weight:700; color:var(--accent); white-space:nowrap; font-size:.98rem; }
+.menu p{ margin:.45rem 0 0; max-width:62ch; }
+.menu a{ color:var(--accent); text-decoration:none; border-bottom:1px solid var(--hair); }
+.pull{ margin:1.4rem 0 .4rem; padding:.4rem 0 .4rem 2.6rem; position:relative; }
+.pull::before{ content:"\201C"; position:absolute; left:-.1rem; top:-.6rem;
+  font-family:var(--serif); font-size:4.2rem; color:var(--accent); line-height:1; }
+.pull q{ font-family:var(--serif); font-style:italic; font-size:1.42rem; line-height:1.32;
+  quotes:none; display:block; max-width:38ch; }
+.pull .cap{ font-size:.95rem; color:var(--muted); margin-top:.7rem; }
+.bring{ list-style:none; padding:0; margin:.8rem 0 .4rem; display:flex; flex-wrap:wrap; gap:.55rem 1.6rem; }
+.bring li{ position:relative; padding-left:1.7rem; }
+.bring li::before{ content:""; position:absolute; left:0; top:.28rem; width:1.05rem; height:1.05rem;
+  border:2px solid var(--accent); border-radius:3px; }
+.bring li::after{ content:""; position:absolute; left:.34rem; top:.3rem; width:.38rem; height:.62rem;
+  border:solid var(--accent); border-width:0 2px 2px 0; transform:rotate(40deg); }
+.note{ margin:1.4rem 0; padding-left:1.1rem; border-left:3px solid var(--olive); }
+.note b{ color:var(--olive); }
+ol.detail{ counter-reset:d; list-style:none; padding:0; margin:.6rem 0; }
+ol.detail li{ counter-increment:d; position:relative; padding:.6rem 0 .6rem 2.1rem; max-width:64ch;
+  border-bottom:1px solid var(--hair); }
+ol.detail li::before{ content:counter(d); position:absolute; left:0; top:.55rem;
+  font-family:var(--serif); font-weight:600; color:var(--gold); font-size:1.15rem; }
+ol.detail b{ font-weight:600; } ol.detail a{ color:var(--accent); }
+.shortlist{ list-style:none; counter-reset:s; padding:0; margin:.8rem 0; }
+.shortlist li{ counter-increment:s; position:relative; padding:.4rem 0 .4rem 2.4rem; max-width:64ch; }
+.shortlist li::before{ content:counter(s,decimal-leading-zero); position:absolute; left:0; top:.5rem;
+  font-family:var(--serif); font-weight:600; font-size:.95rem; color:var(--gold); letter-spacing:.02em; }
+.shortlist b{ font-weight:600; }
+.disclaim{ margin-top:3rem; padding-top:1.1rem; border-top:1px solid var(--hair);
+  color:var(--muted); font-size:.9rem; max-width:64ch; }
+a{ color:var(--accent); } em{ font-style:italic; }
+@media (max-width:620px){
+  .step{ grid-template-columns:1fr; gap:.3rem; }
+  .step .num{ text-align:left; padding:0 0 .3rem; }
+  .step .body{ border-left:none; padding-left:0; }
+  .menu .head{ flex-wrap:wrap; } .menu .lead{ display:none; }
+}
+@page{ size:letter; margin:14mm; }
+@media print{ .page{ padding:0; max-width:none; } body{ font-size:11.5pt; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <p class="kicker">Mebane, NC &middot; June 2026 &middot; the easy version</p>
+  <h1>Put yourself on the list</h1>
+  <svg class="squiggle" viewBox="0 0 180 14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+    <path d="M2 9 C 22 2, 38 2, 58 8 S 96 14, 116 7 S 154 2, 178 8"/>
+  </svg>
+  <p class="dek">You keep a garden going and animals fed. This is the same instinct, pointed at you — get a baseline, then get covered.</p>
+
+  <p class="intro">No big speech here — you already know you want the numbers. I just did the legwork so it's a five-minute phone call instead of a research project. Bonus: <strong>get a baseline now and everything down the road has something to measure against.</strong></p>
+
+  <!-- START HERE -->
+  <div class="cta">
+    <span class="tag">Start here</span>
+    <h2>One call, one visit, you're done &mdash; <span class="price">$149</span></h2>
+    <p>Direct Primary Care Mebane will see you <strong>one time, no membership, no commitment</strong> &mdash; $99 for the visit, or <strong>$149 with the bloodwork included</strong>. Real one-doctor practice right in town (Helen Tackitt, FNP), cash-pay, no insurance involved. Book it, walk in, get your physical and your blood drawn the same day. <a href="https://directprimarycaremebane.com/pricing/">directprimarycaremebane.com</a> &middot; <span class="phone">(919)&nbsp;568-0004</span></p>
+    <div class="pull">
+      <q>Hey &mdash; I'm a self-pay patient. I want the one-time visit with routine bloodwork. How soon can you get me in?</q>
+      <p class="cap">Word-for-word, if you want it fast. Skips the runaround, gets you a date.</p>
+    </div>
+  </div>
+
+  <p style="margin:1.2rem 0 .3rem;"><strong>What to bring:</strong></p>
+  <ul class="bring">
+    <li>Photo ID</li>
+    <li>A card (or HSA) to pay</li>
+    <li>Anything you take regularly</li>
+    <li>Any history worth flagging</li>
+  </ul>
+
+  <div class="note"><b>Worth knowing.</b> The one-time visit includes a doctor reading the bloodwork with you &mdash; that's the difference between walking out knowing where you stand and walking out holding a lab sheet. (If you go the order-your-own route below, that read-it-with-someone part is on you to set up.)</div>
+
+  <!-- STEP 1 -->
+  <section class="step">
+    <div class="num">01</div>
+    <div class="body">
+      <h2>Other ways to skin it</h2>
+      <p class="sub">The one-time visit is the clean move. But if you'd rather, here are the other doors &mdash; all cash, no insurance:</p>
+
+      <div class="menu">
+        <div class="row">
+          <div class="head">
+            <span class="name">Labcorp OnDemand</span>
+            <span class="lead"></span>
+            <span class="tag">just the bloodwork</span>
+          </div>
+          <p>Order the standard panels yourself online &mdash; blood count, metabolic, cholesterol, thyroid &mdash; pay cash, no appointment. A doctor signs off, then you walk into a LabCorp draw site (they're headquartered right in Burlington). Good if you only want the numbers, but then you're on your own to get someone to read them. <a href="https://ondemand.labcorp.com">ondemand.labcorp.com</a></p>
+        </div>
+        <div class="row">
+          <div class="head">
+            <span class="name">DPC membership</span>
+            <span class="lead"></span>
+            <span class="tag">$75/mo &middot; someone steady</span>
+          </div>
+          <p>Same Mebane practice, but as a monthly thing: <strong>$75/mo</strong> plus a one-time <strong>$50</strong> to join, six-month minimum then cancel anytime. Gets you unlimited same- or next-day visits and your annual physical, no copays. Only worth it if you want one doctor who actually knows you over time &mdash; otherwise the one-time visit covers you. Bonus: as of 2026 these fees count as HSA-eligible.</p>
+        </div>
+        <div class="row">
+          <div class="head">
+            <span class="name">Any walk-in clinic</span>
+            <span class="lead"></span>
+            <span class="tag">one and done</span>
+          </div>
+          <p>Urgent care and pharmacy clinics do cash-pay physicals and can draw blood. Costs more per visit and there's no relationship, but it works in a pinch. Call first and ask the cash price.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="step">
+    <div class="num">02</div>
+    <div class="body">
+      <h2>The insurance piece (no rush, but know the date)</h2>
+      <p class="sub">None of the above needs insurance &mdash; that's the point. But for real coverage down the road, there's a calendar catch worth knowing now. NC Medicaid's out (you earn over the ~$1,800/month line), so the route is the <strong>ACA Marketplace</strong> at healthcare.gov &mdash; and you can't just buy a plan mid-year right now.</p>
+
+      <ol class="detail">
+        <li><b>The timing gate.</b> Open enrollment closed January 15, 2026, and the old year-round low-income window got killed in 2025. Right now you can only buy a Marketplace plan if you've had a <b>qualifying life event</b> &mdash; losing other coverage, a move, getting married &mdash; and only for 60 days after. Got one? Jump on it: <a href="https://healthcare.gov">healthcare.gov</a>, or a free NC Navigator at <b>1-855-733-3711</b>.</li>
+        <li><b>The real play: this fall.</b> Open enrollment for 2027 coverage runs about <b>Nov 1, 2026 &ndash; Jan 15, 2027</b> at healthcare.gov. Whether you get help paying &mdash; and how much &mdash; comes down to your actual yearly income, so run your real number through the estimator when you sign up. The Navigator (1-855-733-3711) walks you through it free.</li>
+        <li><b>A bridge, if you want one.</b> Worried about a bad accident before fall? A <b>short-term health plan</b> is a cheap, fast stopgap &mdash; but it's not the real thing: it can skip pre-existing conditions and preventive care. A patch, not a plan.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- SHORT VERSION -->
+  <section class="step keep">
+    <div class="num">&rarr;</div>
+    <div class="body">
+      <h2>The whole thing, in four lines</h2>
+      <ol class="shortlist">
+        <li><b>Call DPC Mebane</b> (919&nbsp;568-0004), book the one-time <span style="color:var(--gold)">$149</span> visit with bloodwork. That's the baseline.</li>
+        <li><b>Bring</b> your ID and a card. Go over the numbers with the doctor before you leave.</li>
+        <li><b>Drop fall enrollment on your calendar</b> &mdash; Nov 1, 2026 to Jan 15, 2027 &mdash; for a real 2027 ACA plan. Use the free Navigator and your actual income.</li>
+        <li><b>That's it.</b> One call now, one note on the calendar. Done.</li>
+      </ol>
+    </div>
+  </section>
+
+  <p class="disclaim">This is practical guidance, not legal or medical advice. The policy numbers &mdash; the Medicaid cutoff, enrollment dates, subsidy rules &mdash; are North Carolina as of June 2026 and can shift, so confirm them when you apply. And call any clinic to check the price before you go.</p>
+
+</div>
+</body>
+</html>
